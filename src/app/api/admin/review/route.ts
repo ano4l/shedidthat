@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { supabaseAdmin } from "@/lib/supabase/server";
+import { sendBookingConfirmedEmail, sendBookingRejectedEmail } from "@/lib/email";
 
-const TEST_MODE = process.env.NEXT_PUBLIC_TEST_MODE === "true";
+const db = supabaseAdmin as any;
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,17 +12,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
-    if (TEST_MODE) {
-      await new Promise((r) => setTimeout(r, 600));
-      const status = action === "APPROVE" ? "CONFIRMED" : "REJECTED";
-      return NextResponse.json({ success: true, status });
-    }
-
-    const { supabaseAdmin } = await import("@/lib/supabase/server");
-    const { sendBookingConfirmedEmail, sendBookingRejectedEmail } = await import("@/lib/email");
-    const admin = supabaseAdmin as any;
-
-    const { data: booking, error: bookingError } = await admin
+    const { data: booking, error: bookingError } = await db
       .from("booking_requests")
       .select("*, services:service_id (name)")
       .eq("id", booking_id)
@@ -31,7 +23,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === "APPROVE") {
-      const { data: conflicts } = await admin
+      const { data: conflicts } = await db
         .from("confirmed_bookings")
         .select("id")
         .lt("start_time", booking.end_time)
@@ -44,7 +36,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      const { error: confirmError } = await admin
+      const { error: confirmError } = await db
         .from("confirmed_bookings")
         .insert({
           booking_request_id: booking.id,
@@ -57,8 +49,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Failed to confirm booking" }, { status: 500 });
       }
 
-      await admin.from("booking_requests").update({ status: "CONFIRMED" }).eq("id", booking_id);
-      await admin.from("payment_proofs").update({ verification_status: "APPROVED", review_note: note || null }).eq("booking_request_id", booking_id);
+      await db.from("booking_requests").update({ status: "CONFIRMED" }).eq("id", booking_id);
+      await db.from("payment_proofs").update({ verification_status: "APPROVED", review_note: note || null }).eq("booking_request_id", booking_id);
 
       const serviceName = booking.services?.name || "Hair Service";
       sendBookingConfirmedEmail({
@@ -75,8 +67,8 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === "REJECT") {
-      await admin.from("booking_requests").update({ status: "REJECTED" }).eq("id", booking_id);
-      await admin.from("payment_proofs").update({ verification_status: "REJECTED", review_note: note || null }).eq("booking_request_id", booking_id);
+      await db.from("booking_requests").update({ status: "REJECTED" }).eq("id", booking_id);
+      await db.from("payment_proofs").update({ verification_status: "REJECTED", review_note: note || null }).eq("booking_request_id", booking_id);
 
       sendBookingRejectedEmail(booking.email, booking.customer_name, note).catch(
         (err: any) => console.error("Email error:", err)

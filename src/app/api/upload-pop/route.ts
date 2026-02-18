@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ACCEPTED_POP_TYPES, MAX_POP_SIZE_MB } from "@/lib/constants";
+import { supabaseAdmin } from "@/lib/supabase/server";
+import { sendPOPReceivedEmail } from "@/lib/email";
 
-const TEST_MODE = process.env.NEXT_PUBLIC_TEST_MODE === "true";
+const db = supabaseAdmin as any;
 
 export async function POST(request: NextRequest) {
   try {
@@ -28,20 +30,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (TEST_MODE) {
-      await new Promise((r) => setTimeout(r, 800));
-      return NextResponse.json({ success: true });
-    }
-
-    const { supabaseAdmin } = await import("@/lib/supabase/server");
-    const { sendPOPReceivedEmail } = await import("@/lib/email");
-    const admin = supabaseAdmin as any;
-
     const fileExt = file.name.split(".").pop();
     const fileName = `${bookingId}-${Date.now()}.${fileExt}`;
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    const { error: uploadError } = await admin.storage
+    const { error: uploadError } = await db.storage
       .from("payment-proofs")
       .upload(fileName, buffer, { contentType: file.type, upsert: false });
 
@@ -50,9 +43,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "File upload failed" }, { status: 500 });
     }
 
-    const { data: urlData } = admin.storage.from("payment-proofs").getPublicUrl(fileName);
+    const { data: urlData } = db.storage.from("payment-proofs").getPublicUrl(fileName);
 
-    const { error: insertError } = await admin
+    const { error: insertError } = await db
       .from("payment_proofs")
       .insert({
         booking_request_id: bookingId,
@@ -66,9 +59,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Failed to save proof record" }, { status: 500 });
     }
 
-    await admin.from("booking_requests").update({ status: "POP_UPLOADED" }).eq("id", bookingId);
+    await db.from("booking_requests").update({ status: "POP_UPLOADED" }).eq("id", bookingId);
 
-    const { data: booking } = await admin
+    const { data: booking } = await db
       .from("booking_requests")
       .select("email, customer_name")
       .eq("id", bookingId)

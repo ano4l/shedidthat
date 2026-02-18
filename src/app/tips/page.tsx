@@ -77,7 +77,7 @@ export default function TipsPage() {
                 key={i}
                 className="bg-white p-8 lg:p-10 group"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white border border-gray-200 text-brand-purple mb-6 group-hover:bg-brand-purple group-hover:border-brand-purple group-hover:text-white transition-all duration-300">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white border border-brand-gold/30 text-brand-gold mb-6 group-hover:bg-brand-gold group-hover:border-brand-gold group-hover:text-white transition-all duration-300">
                   <tip.icon className="h-5 w-5" />
                 </div>
                 <h3 className="font-display text-xl font-semibold text-brand-charcoal mb-3">
@@ -108,7 +108,7 @@ export default function TipsPage() {
             {videos.map((video, i) => (
               <div key={i} className="bg-white border border-brand-cream-dark overflow-hidden">
                 <div className="aspect-video bg-brand-cream flex flex-col items-center justify-center gap-3">
-                  <PlayCircle className="h-14 w-14 text-brand-purple/20" />
+                  <PlayCircle className="h-14 w-14 text-brand-gold/30" />
                   <p className="text-xs text-gray-400">Video coming soon</p>
                 </div>
                 <div className="p-5">

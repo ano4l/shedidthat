@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Instagram, Phone, Mail } from "lucide-react";
 
 export function Footer() {
@@ -9,9 +10,13 @@ export function Footer() {
           {/* Brand */}
           <div className="md:col-span-5">
             <Link href="/" className="inline-block mb-6">
-              <span className="font-display text-3xl font-semibold text-white">
-                She Did That
-              </span>
+              <Image
+                src="/images/logo.png"
+                alt="She Did That"
+                width={180}
+                height={68}
+                className="h-14 w-auto object-contain brightness-0 invert"
+              />
             </Link>
             <p className="text-sm text-white/60 max-w-xs leading-relaxed">
               Premium hair styling services. From braids to cornrows, we create

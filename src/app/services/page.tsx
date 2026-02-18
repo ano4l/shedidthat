@@ -14,7 +14,7 @@ async function getServices(): Promise<Service[]> {
     console.error("Error fetching services:", error);
     return [];
   }
-  return data || [];
+  return (data as Service[]) || [];
 }
 
 export default async function ServicesPage() {
@@ -55,13 +55,13 @@ export default async function ServicesPage() {
                 return (
                   <div
                     key={service.id}
-                    className="bg-white p-8 lg:p-10 group"
+                    className="bg-white p-8 lg:p-10 group hover:bg-brand-gold/[0.02] transition-colors duration-200"
                   >
                     <div className="flex items-start justify-between mb-3">
                       <h3 className="font-display text-2xl font-semibold text-brand-charcoal group-hover:text-brand-purple transition-colors duration-200">
                         {service.name}
                       </h3>
-                      <span className="font-display text-2xl font-semibold text-brand-purple whitespace-nowrap ml-4">
+                      <span className="font-display text-2xl font-semibold text-brand-gold whitespace-nowrap ml-4">
                         {formatCurrency(service.full_price)}
                       </span>
                     </div>

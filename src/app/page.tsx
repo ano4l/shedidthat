@@ -91,7 +91,8 @@ export default function HomePage() {
             <div className="py-20 lg:py-32 lg:pr-16">
               <p className="section-label mb-6">Premium Hair Studio</p>
               <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-semibold text-brand-charcoal leading-[1.05]">
-                Beautiful Braids, Crafted With Care
+                Beautiful Braids,{" "}
+                <span className="text-brand-gold">Crafted</span> With Care
               </h1>
               <p className="mt-8 text-base text-gray-500 max-w-lg leading-relaxed">
                 From knotless box braids to sleek cornrows, She Did That is your
@@ -147,15 +148,15 @@ export default function HomePage() {
       </section>
 
       {/* Stats Bar */}
-      <section className="bg-brand-purple text-white">
+      <section className="bg-brand-charcoal text-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 lg:py-14">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-16">
             {stats.map((stat, i) => (
               <div key={i} className="text-center">
-                <p className="font-display text-3xl sm:text-4xl font-semibold text-white">
+                <p className="font-display text-3xl sm:text-4xl font-semibold text-brand-gold">
                   {stat.value}
                 </p>
-                <p className="text-sm text-white/50 mt-1">{stat.label}</p>
+                <p className="text-sm text-white/60 mt-1">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -176,12 +177,12 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {services.map((svc, i) => (
-              <div key={i} className="border border-gray-200 p-8 lg:p-10 group hover:border-brand-purple/30 transition-all duration-300">
+              <div key={i} className="border border-gray-200 p-8 lg:p-10 group hover:border-brand-gold/40 transition-all duration-300">
                 <div className="flex items-start justify-between mb-4">
                   <h3 className="font-display text-2xl font-semibold text-brand-charcoal group-hover:text-brand-purple transition-colors">
                     {svc.name}
                   </h3>
-                  <span className="font-display text-xl font-semibold text-brand-purple whitespace-nowrap ml-4">
+                  <span className="font-display text-xl font-semibold text-brand-gold whitespace-nowrap ml-4">
                     {svc.price}
                   </span>
                 </div>
@@ -247,15 +248,15 @@ export default function HomePage() {
               </p>
               <div className="grid grid-cols-3 gap-6 mb-8">
                 <div className="text-center">
-                  <Shield className="h-5 w-5 text-brand-purple mx-auto mb-2" />
+                  <Shield className="h-5 w-5 text-brand-gold mx-auto mb-2" />
                   <p className="text-xs font-medium text-brand-charcoal">Protective Styles</p>
                 </div>
                 <div className="text-center">
-                  <Heart className="h-5 w-5 text-brand-purple mx-auto mb-2" />
+                  <Heart className="h-5 w-5 text-brand-gold mx-auto mb-2" />
                   <p className="text-xs font-medium text-brand-charcoal">Hair Health First</p>
                 </div>
                 <div className="text-center">
-                  <Sparkles className="h-5 w-5 text-brand-purple mx-auto mb-2" />
+                  <Sparkles className="h-5 w-5 text-brand-gold mx-auto mb-2" />
                   <p className="text-xs font-medium text-brand-charcoal">Premium Products</p>
                 </div>
               </div>
@@ -285,8 +286,8 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
             {steps.map((step, i) => (
               <div key={i} className="text-center group">
-                <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-white border border-gray-200 group-hover:bg-brand-purple group-hover:border-brand-purple transition-all duration-300">
-                  <step.icon className="h-6 w-6 text-brand-purple group-hover:text-white transition-colors duration-300" />
+                <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-white border border-brand-gold/30 group-hover:bg-brand-gold group-hover:border-brand-gold transition-all duration-300">
+                  <step.icon className="h-6 w-6 text-brand-gold group-hover:text-white transition-colors duration-300" />
                 </div>
                 <p className="text-xs font-medium uppercase tracking-editorial text-brand-gold mb-3">
                   Step {i + 1}
@@ -317,7 +318,7 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {testimonials.map((t, i) => (
-              <div key={i} className="border border-gray-200 p-8 text-center hover:shadow-soft transition-all duration-300">
+              <div key={i} className="border border-gray-200 p-8 text-center hover:border-brand-gold/30 hover:shadow-soft transition-all duration-300">
                 <div className="flex justify-center gap-1 mb-6">
                   {[...Array(5)].map((_, j) => (
                     <Star key={j} className="h-4 w-4 fill-brand-gold text-brand-gold" />

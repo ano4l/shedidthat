@@ -2,8 +2,8 @@ import { Resend } from "resend";
 import { BANKING_DETAILS } from "./constants";
 import { formatCurrency, formatDateTime } from "./utils";
 
-const resend = new Resend(process.env.RESEND_API_KEY || "re_placeholder");
-const FROM = process.env.EMAIL_FROM || "bookings@shedidthat.co.za";
+const resend = new Resend(process.env.RESEND_API_KEY);
+const FROM = process.env.EMAIL_FROM || "anotida@virtukey.co.za";
 
 interface BookingEmailData {
   customerName: string;

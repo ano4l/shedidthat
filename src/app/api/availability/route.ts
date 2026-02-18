@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateTimeSlots } from "@/lib/utils";
-import { parseISO } from "date-fns";
-
-const TEST_MODE = process.env.NEXT_PUBLIC_TEST_MODE === "true";
+import { supabaseAdmin } from "@/lib/supabase/server";
+import { parseISO, startOfDay, endOfDay } from "date-fns";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -14,20 +13,6 @@ export async function GET(request: NextRequest) {
   }
 
   const date = parseISO(dateStr);
-
-  if (TEST_MODE) {
-    const slots = generateTimeSlots(date, duration, [], []);
-    return NextResponse.json({
-      slots: slots.map((s) => ({
-        start: s.start.toISOString(),
-        end: s.end.toISOString(),
-        label: s.label,
-      })),
-    });
-  }
-
-  const { supabaseAdmin } = await import("@/lib/supabase/server");
-  const { startOfDay, endOfDay } = await import("date-fns");
   const dayStart = startOfDay(date).toISOString();
   const dayEnd = endOfDay(date).toISOString();
 

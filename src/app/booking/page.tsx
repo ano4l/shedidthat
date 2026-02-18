@@ -84,11 +84,12 @@ function BookingContent() {
         .from("services")
         .select("*")
         .order("full_price", { ascending: true });
-      setServices(data || []);
+      const svcData = (data as Service[]) || [];
+      setServices(svcData);
       setLoading(false);
 
-      if (preselectedServiceId && data) {
-        const found = data.find((s: Service) => s.id === preselectedServiceId);
+      if (preselectedServiceId && svcData.length > 0) {
+        const found = svcData.find((s) => s.id === preselectedServiceId);
         if (found) {
           setBooking((prev) => ({ ...prev, service: found }));
           if (found.has_hair_options) {
@@ -110,7 +111,7 @@ function BookingContent() {
         .from("hair_options")
         .select("*")
         .eq("service_id", booking.service!.id);
-      setHairOptions(data || []);
+      setHairOptions((data as HairOption[]) || []);
     }
     loadOptions();
   }, [booking.service]);
@@ -326,7 +327,7 @@ function BookingContent() {
                         {s.duration_minutes} min
                       </span>
                     </div>
-                    <span className="font-display text-xl font-semibold text-brand-purple whitespace-nowrap ml-6">
+                    <span className="font-display text-xl font-semibold text-brand-gold whitespace-nowrap ml-6">
                       {formatCurrency(s.full_price)}
                     </span>
                   </button>
@@ -361,7 +362,7 @@ function BookingContent() {
                     )}
                   >
                     <span className="font-medium text-brand-charcoal">{opt.name}</span>
-                    <span className="text-sm font-semibold text-brand-purple">
+                    <span className="text-sm font-semibold text-brand-gold">
                       {opt.price_delta > 0
                         ? `+${formatCurrency(opt.price_delta)}`
                         : opt.price_delta === 0
@@ -540,7 +541,7 @@ function BookingContent() {
                       )}
                     >
                       <p className="font-medium text-brand-charcoal text-sm">Pay Deposit</p>
-                      <p className="font-display text-xl font-semibold text-brand-purple mt-1">
+                      <p className="font-display text-xl font-semibold text-brand-gold mt-1">
                         {formatCurrency(
                           calculateAmountDue(
                             booking.service!.full_price,
@@ -564,7 +565,7 @@ function BookingContent() {
                       )}
                     >
                       <p className="font-medium text-brand-charcoal text-sm">Pay Full</p>
-                      <p className="font-display text-xl font-semibold text-brand-purple mt-1">
+                      <p className="font-display text-xl font-semibold text-brand-gold mt-1">
                         {formatCurrency(totalPrice)}
                       </p>
                     </button>
@@ -632,7 +633,7 @@ function BookingContent() {
               <div className="border border-brand-cream-dark p-6 mb-6">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-medium uppercase tracking-editorial text-gray-400">Amount Due</span>
-                  <span className="font-display text-2xl font-semibold text-brand-purple">
+                  <span className="font-display text-2xl font-semibold text-brand-gold">
                     {formatCurrency(bookingResult.amountDue)}
                   </span>
                 </div>
@@ -641,7 +642,7 @@ function BookingContent() {
                   <span className="text-xs font-medium uppercase tracking-editorial text-gray-400">Reference</span>
                   <button
                     onClick={copyRef}
-                    className="flex items-center gap-2 text-sm font-mono font-bold text-brand-purple hover:text-brand-purple-dark transition-colors"
+                    className="flex items-center gap-2 text-sm font-mono font-bold text-brand-gold hover:text-brand-gold-dark transition-colors"
                   >
                     {bookingResult.reference}
                     <Copy className="h-3.5 w-3.5" />

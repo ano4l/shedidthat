@@ -13,12 +13,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [loginLoading, setLoginLoading] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }: any) => {
+    supabase.auth.getSession().then(({ data }) => {
       setSession(data?.session);
       setLoading(false);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
 

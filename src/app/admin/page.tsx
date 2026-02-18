@@ -217,7 +217,7 @@ export default function AdminPage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400">Amount</span>
-                  <span className="font-medium text-brand-purple">
+                  <span className="font-medium text-brand-gold">
                     {formatCurrency(selectedBooking.amount_due)}
                   </span>
                 </div>

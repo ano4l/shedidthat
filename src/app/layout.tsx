@@ -3,7 +3,6 @@ import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { TestModeBanner } from "@/components/TestModeBanner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -21,6 +20,15 @@ export const metadata: Metadata = {
   description:
     "Book your next hair appointment at SheDidThat. Premium braiding, cornrows, and styling services.",
   keywords: ["hair salon", "braiding", "cornrows", "booking", "South Africa"],
+  icons: {
+    icon: "/images/icon.png",
+    apple: "/images/icon.png",
+  },
+  openGraph: {
+    title: "SheDidThat — Premium Hair Studio",
+    description: "Book your next hair appointment at SheDidThat. Premium braiding, cornrows, and styling services.",
+    images: [{ url: "/images/icon.png" }],
+  },
 };
 
 export default function RootLayout({
@@ -31,7 +39,6 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <body className="font-sans min-h-screen flex flex-col">
-        <TestModeBanner />
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
