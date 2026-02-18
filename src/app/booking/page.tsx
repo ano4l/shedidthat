@@ -52,7 +52,7 @@ function BookingContent() {
 
   const [step, setStep] = useState<Step>("service");
   const [services, setServices] = useState<Service[]>([]);
-  const [hairOptions, setHairOptions] = useState<HairOption[]>([]);
+  const [allHairOptions, setAllHairOptions] = useState<Record<string, HairOption[]>>({});
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [slots, setSlots] = useState<{ start: Date; end: Date; label: string }[]>([]);
@@ -77,15 +77,25 @@ function BookingContent() {
     paymentChoice: "DEPOSIT",
   });
 
-  // Fetch services
+  // Fetch services + all hair options in parallel on mount
   useEffect(() => {
     async function load() {
-      const { data } = await supabase
-        .from("services")
-        .select("*")
-        .order("full_price", { ascending: true });
-      const svcData = (data as Service[]) || [];
+      const [svcRes, hairRes] = await Promise.all([
+        supabase.from("services").select("*").order("full_price", { ascending: true }),
+        supabase.from("hair_options").select("*"),
+      ]);
+      const svcData = (svcRes.data as Service[]) || [];
+      const hairData = (hairRes.data as HairOption[]) || [];
+
+      // Group hair options by service_id for instant lookup
+      const grouped: Record<string, HairOption[]> = {};
+      for (const opt of hairData) {
+        if (!grouped[opt.service_id]) grouped[opt.service_id] = [];
+        grouped[opt.service_id].push(opt);
+      }
+
       setServices(svcData);
+      setAllHairOptions(grouped);
       setLoading(false);
 
       if (preselectedServiceId && svcData.length > 0) {
@@ -103,18 +113,8 @@ function BookingContent() {
     load();
   }, [preselectedServiceId]);
 
-  // Fetch hair options when service changes
-  useEffect(() => {
-    if (!booking.service?.has_hair_options) return;
-    async function loadOptions() {
-      const { data } = await supabase
-        .from("hair_options")
-        .select("*")
-        .eq("service_id", booking.service!.id);
-      setHairOptions((data as HairOption[]) || []);
-    }
-    loadOptions();
-  }, [booking.service]);
+  // Derive hair options for current service from cache (instant, no fetch)
+  const hairOptions = booking.service ? (allHairOptions[booking.service.id] || []) : [];
 
   // Fetch available slots when date changes
   const loadSlots = useCallback(async () => {

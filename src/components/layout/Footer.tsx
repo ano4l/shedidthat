@@ -13,9 +13,9 @@ export function Footer() {
               <Image
                 src="/images/logo.png"
                 alt="She Did That"
-                width={180}
-                height={68}
-                className="h-14 w-auto object-contain brightness-0 invert"
+                width={220}
+                height={82}
+                className="h-[4.5rem] w-auto object-contain brightness-0 invert"
               />
             </Link>
             <p className="text-sm text-white/60 max-w-xs leading-relaxed">
