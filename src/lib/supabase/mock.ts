@@ -138,28 +138,38 @@ export const MOCK_ADMIN_BOOKINGS = [
 
 // ─── Mock Supabase Client ─────────────────────────────────────────────────────
 
-function createMockQuery(data: any[]) {
-  let _data = [...data];
+function createMockQuery(sourceData: any[]) {
+  let _data = [...sourceData];
+
   const query: any = {
-    data: _data,
-    error: null,
-    select: () => query,
+    select: (_cols?: string) => query,
     order: (_col: string, _opts?: any) => query,
     eq: (col: string, val: any) => {
-      _data = data.filter((row) => row[col] === val);
-      query.data = _data;
+      _data = _data.filter((row: any) => row[col] === val);
       return query;
     },
     in: (col: string, vals: any[]) => {
-      _data = data.filter((row) => vals.includes(row[col]));
-      query.data = _data;
+      _data = _data.filter((row: any) => vals.includes(row[col]));
       return query;
     },
-    then: (resolve: any) =>
-      Promise.resolve({ data: _data, error: null }).then(resolve),
+    single: () => {
+      return Promise.resolve({ data: _data[0] || null, error: null });
+    },
+    then: (resolve: any, reject?: any) => {
+      return Promise.resolve({ data: _data, error: null }).then(resolve, reject);
+    },
   };
   return query;
 }
+
+let _authChangeCallback: ((event: string, session: any) => void) | null = null;
+
+const MOCK_SESSION = {
+  user: { id: "mock-admin", email: "admin@shedidthat.co.za" },
+  access_token: "mock-token",
+};
+
+let _currentSession: any = null;
 
 export const mockSupabase = {
   from: (table: string) => {
@@ -173,22 +183,27 @@ export const mockSupabase = {
   },
   auth: {
     getSession: async () => ({
-      data: {
-        session: {
-          user: { id: "mock-admin", email: "admin@shedidthat.co.za" },
-          access_token: "mock-token",
-        },
-      },
+      data: { session: _currentSession },
     }),
-    onAuthStateChange: (_event: any, _cb: any) => ({
-      data: { subscription: { unsubscribe: () => {} } },
-    }),
-    signInWithPassword: async ({ email }: { email: string; password: string }) => {
-      if (email === "admin@shedidthat.co.za") {
-        return { error: null };
-      }
-      return { error: { message: "In test mode, use admin@shedidthat.co.za" } };
+    onAuthStateChange: (cb: any) => {
+      _authChangeCallback = cb;
+      return {
+        data: { subscription: { unsubscribe: () => { _authChangeCallback = null; } } },
+      };
     },
-    signOut: async () => ({ error: null }),
+    signInWithPassword: async (_creds: { email: string; password: string }) => {
+      _currentSession = MOCK_SESSION;
+      if (_authChangeCallback) {
+        _authChangeCallback("SIGNED_IN", MOCK_SESSION);
+      }
+      return { error: null };
+    },
+    signOut: async () => {
+      _currentSession = null;
+      if (_authChangeCallback) {
+        _authChangeCallback("SIGNED_OUT", null);
+      }
+      return { error: null };
+    },
   },
 };
