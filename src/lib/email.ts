@@ -2,7 +2,11 @@ import { Resend } from "resend";
 import { BANKING_DETAILS } from "./constants";
 import { formatCurrency, formatDateTime } from "./utils";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let _resend: Resend | null = null;
+function getResend() {
+  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY || "");
+  return _resend;
+}
 const FROM = process.env.EMAIL_FROM || "anotida@virtukey.co.za";
 
 interface BookingEmailData {
@@ -17,7 +21,7 @@ interface BookingEmailData {
 
 export async function sendPaymentInstructionsEmail(data: BookingEmailData) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM,
     to: data.email,
     subject: "Payment Instructions — SheDidThat",
@@ -50,7 +54,7 @@ export async function sendPaymentInstructionsEmail(data: BookingEmailData) {
 }
 
 export async function sendPOPReceivedEmail(email: string, customerName: string) {
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM,
     to: email,
     subject: "Proof of Payment Received — SheDidThat",
@@ -67,7 +71,7 @@ export async function sendPOPReceivedEmail(email: string, customerName: string) 
 }
 
 export async function sendBookingConfirmedEmail(data: BookingEmailData) {
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM,
     to: data.email,
     subject: "Booking Confirmed \u2705 — SheDidThat",
@@ -94,7 +98,7 @@ export async function sendBookingRejectedEmail(
   customerName: string,
   reason?: string
 ) {
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM,
     to: email,
     subject: "POP Rejected — SheDidThat",
