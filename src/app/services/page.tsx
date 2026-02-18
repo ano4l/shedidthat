@@ -1,22 +1,27 @@
 import Link from "next/link";
 import { Clock, ArrowRight } from "lucide-react";
-import { supabase } from "@/lib/supabase/client";
+import { supabaseAdmin } from "@/lib/supabase/server";
 import { formatCurrency } from "@/lib/utils";
 import type { Service } from "@/lib/types/database";
 
 export const dynamic = "force-dynamic";
 
 async function getServices(): Promise<Service[]> {
-  const { data, error } = await supabase
-    .from("services")
-    .select("*")
-    .order("full_price", { ascending: true });
+  try {
+    const { data, error } = await (supabaseAdmin as any)
+      .from("services")
+      .select("*")
+      .order("full_price", { ascending: true });
 
-  if (error) {
-    console.error("Error fetching services:", error);
+    if (error) {
+      console.error("Error fetching services:", error);
+      return [];
+    }
+    return (data as Service[]) || [];
+  } catch (err) {
+    console.error("Failed to fetch services:", err);
     return [];
   }
-  return (data as Service[]) || [];
 }
 
 export default async function ServicesPage() {

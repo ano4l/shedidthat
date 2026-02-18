@@ -1,10 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { Lock, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState("");
@@ -13,16 +17,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [loginLoading, setLoginLoading] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data?.session);
+    try {
+      supabase.auth.getSession().then(({ data }) => {
+        setSession(data?.session);
+        setLoading(false);
+      }).catch(() => {
+        setLoading(false);
+      });
+
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        setSession(session);
+      });
+
+      return () => subscription.unsubscribe();
+    } catch {
       setLoading(false);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
+    }
   }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -90,11 +100,34 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
+  const adminTabs = [
+    { href: "/admin", label: "Bookings" },
+    { href: "/admin/services", label: "Services" },
+  ];
+
   return (
     <div>
       <div className="bg-brand-purple px-4 py-3">
         <div className="mx-auto max-w-7xl flex items-center justify-between">
-          <h2 className="text-sm font-medium text-white/80">Admin Dashboard</h2>
+          <div className="flex items-center gap-6">
+            <h2 className="text-sm font-medium text-white/80">Admin</h2>
+            <nav className="flex items-center gap-1">
+              {adminTabs.map((tab) => (
+                <Link
+                  key={tab.href}
+                  href={tab.href}
+                  className={cn(
+                    "px-3 py-1.5 text-xs font-medium rounded transition-colors",
+                    pathname === tab.href
+                      ? "bg-white/20 text-white"
+                      : "text-white/50 hover:text-white hover:bg-white/10"
+                  )}
+                >
+                  {tab.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
           <button
             onClick={handleLogout}
             className="text-xs text-white/50 hover:text-white transition-colors"

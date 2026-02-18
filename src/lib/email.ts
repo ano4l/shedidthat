@@ -3,8 +3,15 @@ import { BANKING_DETAILS } from "./constants";
 import { formatCurrency, formatDateTime } from "./utils";
 
 let _resend: Resend | null = null;
-function getResend() {
-  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY || "");
+function getResend(): Resend {
+  if (!_resend) {
+    const key = process.env.RESEND_API_KEY;
+    if (!key) {
+      // Return a stub that won't crash — emails just won't send
+      return { emails: { send: async () => { console.warn("RESEND_API_KEY not set, skipping email"); return { data: null, error: null }; } } } as any;
+    }
+    _resend = new Resend(key);
+  }
   return _resend;
 }
 const FROM = process.env.EMAIL_FROM || "anotida@virtukey.co.za";

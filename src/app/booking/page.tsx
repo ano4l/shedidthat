@@ -80,35 +80,39 @@ function BookingContent() {
   // Fetch services + all hair options in parallel on mount
   useEffect(() => {
     async function load() {
-      const [svcRes, hairRes] = await Promise.all([
-        supabase.from("services").select("*").order("full_price", { ascending: true }),
-        supabase.from("hair_options").select("*"),
-      ]);
-      const svcData = (svcRes.data as Service[]) || [];
-      const hairData = (hairRes.data as HairOption[]) || [];
+      try {
+        const [svcRes, hairRes] = await Promise.all([
+          supabase.from("services").select("*").order("full_price", { ascending: true }),
+          supabase.from("hair_options").select("*"),
+        ]);
+        const svcData = (svcRes.data as Service[]) || [];
+        const hairData = (hairRes.data as HairOption[]) || [];
 
-      // Group hair options by service_id for instant lookup
-      const grouped: Record<string, HairOption[]> = {};
-      for (const opt of hairData) {
-        if (!grouped[opt.service_id]) grouped[opt.service_id] = [];
-        grouped[opt.service_id].push(opt);
-      }
+        // Group hair options by service_id for instant lookup
+        const grouped: Record<string, HairOption[]> = {};
+        for (const opt of hairData) {
+          if (!grouped[opt.service_id]) grouped[opt.service_id] = [];
+          grouped[opt.service_id].push(opt);
+        }
 
-      setServices(svcData);
-      setAllHairOptions(grouped);
-      setLoading(false);
+        setServices(svcData);
+        setAllHairOptions(grouped);
 
-      if (preselectedServiceId && svcData.length > 0) {
-        const found = svcData.find((s) => s.id === preselectedServiceId);
-        if (found) {
-          setBooking((prev) => ({ ...prev, service: found }));
-          if (found.has_hair_options) {
-            setStep("hair");
-          } else {
-            setStep("datetime");
+        if (preselectedServiceId && svcData.length > 0) {
+          const found = svcData.find((s) => s.id === preselectedServiceId);
+          if (found) {
+            setBooking((prev) => ({ ...prev, service: found }));
+            if (found.has_hair_options) {
+              setStep("hair");
+            } else {
+              setStep("datetime");
+            }
           }
         }
+      } catch (err) {
+        console.error("Failed to load services:", err);
       }
+      setLoading(false);
     }
     load();
   }, [preselectedServiceId]);
