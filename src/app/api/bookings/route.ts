@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
       customerName: customer_name, email,
       serviceName: service?.name || "Hair Service",
       dateTime: start_time, amountDue: amount_due, reference, bookingId: booking.id,
-    }).catch((err) => console.error("Email send error:", err));
+    }).catch((err: any) => console.error("Email send error:", err));
 
     return NextResponse.json({ id: booking.id, reference, status: "REQUESTED" });
   } catch (err) {

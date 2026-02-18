@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { formatCurrency, calculateAmountDue, generateTimeSlots, cn } from "@/lib/utils";
@@ -18,6 +18,20 @@ import {
 } from "lucide-react";
 import type { Service, HairOption, PaymentChoice } from "@/lib/types/database";
 
+export default function BookingPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <Loader2 className="h-6 w-6 animate-spin text-brand-purple" />
+        </div>
+      }
+    >
+      <BookingContent />
+    </Suspense>
+  );
+}
+
 type Step = "service" | "hair" | "datetime" | "details" | "payment" | "upload" | "done";
 
 interface BookingState {
@@ -31,7 +45,7 @@ interface BookingState {
   paymentChoice: PaymentChoice;
 }
 
-export default function BookingPage() {
+function BookingContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const preselectedServiceId = searchParams.get("service");
