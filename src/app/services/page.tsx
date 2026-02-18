@@ -4,6 +4,8 @@ import { supabase } from "@/lib/supabase/client";
 import { formatCurrency } from "@/lib/utils";
 import type { Service } from "@/lib/types/database";
 
+export const dynamic = "force-dynamic";
+
 async function getServices(): Promise<Service[]> {
   const { data, error } = await supabase
     .from("services")
