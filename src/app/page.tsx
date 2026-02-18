@@ -14,18 +14,28 @@ import {
 
 const services = [
   {
-    name: "Box Braids",
-    description: "Knotless, bohemian, or jumbo — your choice of style.",
-    price: "From R400",
-    duration: "4 hrs",
-    href: "/booking?service=svc-1",
+    name: "Brownie Afro",
+    description: "Warm, rich brown tones that frame your face beautifully. A natural, confident look.",
+    price: "R550",
+    duration: "—",
+    image: "/images/brownie.jpg",
+    href: "/booking",
   },
   {
-    name: "Cornrows",
-    description: "6, 8, 10, or 12 rows — sleek and polished.",
-    price: "From R300",
-    duration: "1.5 hrs",
-    href: "/booking?service=svc-2",
+    name: "Black Afro",
+    description: "Classic deep black for timeless elegance. Bold, sleek, and always in style.",
+    price: "R550",
+    duration: "—",
+    image: "/images/black afro.jpg",
+    href: "/booking",
+  },
+  {
+    name: "Goldie Afro",
+    description: "Golden honey blonde that catches the light. Radiant warmth for a standout look.",
+    price: "R550",
+    duration: "—",
+    image: "/images/goldie.jpg",
+    href: "/booking",
   },
 ];
 
@@ -131,16 +141,15 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right — Image placeholder */}
+            {/* Right — Hero Image */}
             <div className="relative hidden lg:block">
               <div className="absolute inset-0 bg-brand-purple/5 rounded-tl-[80px]" />
-              <div className="relative h-full min-h-[600px] bg-brand-purple/[0.03] rounded-tl-[80px] flex items-center justify-center">
-                <div className="text-center p-12">
-                  <div className="w-64 h-80 bg-brand-cream-dark rounded-tl-[60px] rounded-br-[60px] mx-auto mb-6 flex items-center justify-center">
-                    <Scissors className="h-12 w-12 text-brand-purple/20" />
-                  </div>
-                  <p className="text-xs text-gray-400">Add your hero photo here</p>
-                </div>
+              <div className="relative h-full min-h-[600px] rounded-tl-[80px] overflow-hidden">
+                <img
+                  src="/images/hero.jpg"
+                  alt="Beautiful braided hairstyle"
+                  className="w-full h-full object-cover"
+                />
               </div>
             </div>
           </div>
@@ -167,19 +176,26 @@ export default function HomePage() {
       <section className="py-24 lg:py-32 bg-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <p className="section-label mb-4">Our Services</p>
+            <p className="section-label mb-4">Our Products</p>
             <h2 className="section-heading">
-              What We Offer
+              Shop Afro Wigs
             </h2>
             <p className="section-subheading max-w-lg mx-auto">
-              Two signature services, perfected over years of practice. Choose your style and we&apos;ll handle the rest.
+              Premium quality afro wigs in three stunning shades. Natural look, comfortable fit, all at one great price.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {services.map((svc, i) => (
-              <div key={i} className="border border-gray-200 p-8 lg:p-10 group hover:border-brand-gold/40 transition-all duration-300">
+              <div key={i} className="border border-gray-200 p-6 lg:p-8 group hover:border-brand-gold/40 transition-all duration-300">
+                <div className="aspect-square mb-6 overflow-hidden bg-gray-100">
+                  <img
+                    src={svc.image}
+                    alt={svc.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
                 <div className="flex items-start justify-between mb-4">
-                  <h3 className="font-display text-2xl font-semibold text-brand-charcoal group-hover:text-brand-purple transition-colors">
+                  <h3 className="font-display text-xl font-semibold text-brand-charcoal group-hover:text-brand-purple transition-colors">
                     {svc.name}
                   </h3>
                   <span className="font-display text-xl font-semibold text-brand-gold whitespace-nowrap ml-4">
@@ -198,7 +214,7 @@ export default function HomePage() {
                     href={svc.href}
                     className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-purple hover:text-brand-purple-dark transition-colors"
                   >
-                    Book Now <ArrowRight className="h-3.5 w-3.5" />
+                    Buy Now <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
               </div>
@@ -216,15 +232,14 @@ export default function HomePage() {
       <section className="py-24 lg:py-32">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
-            {/* Image placeholder */}
+            {/* Image */}
             <div className="relative">
-              <div className="aspect-[4/5] bg-brand-purple/[0.03] rounded-tr-[60px] rounded-bl-[60px] flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-48 h-64 bg-brand-cream-dark rounded-tr-[40px] rounded-bl-[40px] mx-auto flex items-center justify-center">
-                    <Sparkles className="h-10 w-10 text-brand-purple/20" />
-                  </div>
-                  <p className="text-xs text-gray-400 mt-4">Add your photo here</p>
-                </div>
+              <div className="aspect-[4/5] rounded-tr-[60px] rounded-bl-[60px] overflow-hidden">
+                <img
+                  src="/images/homepage.jpg"
+                  alt="She Did That hair studio"
+                  className="w-full h-full object-cover"
+                />
               </div>
             </div>
 
