@@ -1,0 +1,730 @@
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase/client";
+import { formatCurrency, calculateAmountDue, generateTimeSlots, cn } from "@/lib/utils";
+import { BANKING_DETAILS, BUSINESS_HOURS } from "@/lib/constants";
+import { format, addDays, startOfDay, parseISO } from "date-fns";
+import {
+  ChevronLeft,
+  Clock,
+  Loader2,
+  CheckCircle,
+  Banknote,
+  Copy,
+  Upload,
+  ArrowRight,
+} from "lucide-react";
+import type { Service, HairOption, PaymentChoice } from "@/lib/types/database";
+
+type Step = "service" | "hair" | "datetime" | "details" | "payment" | "upload" | "done";
+
+interface BookingState {
+  service: Service | null;
+  hairOption: HairOption | null;
+  date: Date | null;
+  timeSlot: { start: Date; end: Date; label: string } | null;
+  name: string;
+  email: string;
+  phone: string;
+  paymentChoice: PaymentChoice;
+}
+
+export default function BookingPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const preselectedServiceId = searchParams.get("service");
+
+  const [step, setStep] = useState<Step>("service");
+  const [services, setServices] = useState<Service[]>([]);
+  const [hairOptions, setHairOptions] = useState<HairOption[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [slots, setSlots] = useState<{ start: Date; end: Date; label: string }[]>([]);
+  const [slotsLoading, setSlotsLoading] = useState(false);
+  const [bookingResult, setBookingResult] = useState<{
+    id: string;
+    reference: string;
+    amountDue: number;
+  } | null>(null);
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const [booking, setBooking] = useState<BookingState>({
+    service: null,
+    hairOption: null,
+    date: null,
+    timeSlot: null,
+    name: "",
+    email: "",
+    phone: "",
+    paymentChoice: "DEPOSIT",
+  });
+
+  // Fetch services
+  useEffect(() => {
+    async function load() {
+      const { data } = await supabase
+        .from("services")
+        .select("*")
+        .order("full_price", { ascending: true });
+      setServices(data || []);
+      setLoading(false);
+
+      if (preselectedServiceId && data) {
+        const found = data.find((s: Service) => s.id === preselectedServiceId);
+        if (found) {
+          setBooking((prev) => ({ ...prev, service: found }));
+          if (found.has_hair_options) {
+            setStep("hair");
+          } else {
+            setStep("datetime");
+          }
+        }
+      }
+    }
+    load();
+  }, [preselectedServiceId]);
+
+  // Fetch hair options when service changes
+  useEffect(() => {
+    if (!booking.service?.has_hair_options) return;
+    async function loadOptions() {
+      const { data } = await supabase
+        .from("hair_options")
+        .select("*")
+        .eq("service_id", booking.service!.id);
+      setHairOptions(data || []);
+    }
+    loadOptions();
+  }, [booking.service]);
+
+  // Fetch available slots when date changes
+  const loadSlots = useCallback(async () => {
+    if (!booking.date || !booking.service) return;
+    setSlotsLoading(true);
+    try {
+      const dateStr = format(booking.date, "yyyy-MM-dd");
+      const res = await fetch(
+        `/api/availability?date=${dateStr}&duration=${booking.service.duration_minutes}`
+      );
+      const data = await res.json();
+      if (data.slots) {
+        setSlots(
+          data.slots.map((s: { start: string; end: string; label: string }) => ({
+            start: parseISO(s.start),
+            end: parseISO(s.end),
+            label: s.label,
+          }))
+        );
+      }
+    } catch {
+      setSlots([]);
+    }
+    setSlotsLoading(false);
+  }, [booking.date, booking.service]);
+
+  useEffect(() => {
+    loadSlots();
+  }, [loadSlots]);
+
+  const selectService = (service: Service) => {
+    setBooking((prev) => ({ ...prev, service, hairOption: null }));
+    if (service.has_hair_options) {
+      setStep("hair");
+    } else {
+      setStep("datetime");
+    }
+  };
+
+  const selectHairOption = (option: HairOption) => {
+    setBooking((prev) => ({ ...prev, hairOption: option }));
+    setStep("datetime");
+  };
+
+  const totalPrice =
+    (booking.service?.full_price || 0) + (booking.hairOption?.price_delta || 0);
+
+  const amountDue = booking.service
+    ? calculateAmountDue(
+        booking.service.full_price,
+        booking.hairOption?.price_delta || 0,
+        booking.service.deposit_type,
+        booking.service.deposit_value,
+        booking.paymentChoice
+      )
+    : 0;
+
+  const handleSubmitBooking = async () => {
+    if (!booking.service || !booking.timeSlot) return;
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customer_name: booking.name,
+          email: booking.email,
+          phone: booking.phone,
+          service_id: booking.service.id,
+          hair_option_id: booking.hairOption?.id || null,
+          start_time: booking.timeSlot.start.toISOString(),
+          end_time: booking.timeSlot.end.toISOString(),
+          payment_choice: booking.paymentChoice,
+          amount_due: amountDue,
+        }),
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setBookingResult({
+        id: data.id,
+        reference: data.reference,
+        amountDue,
+      });
+      setStep("payment");
+    } catch (err) {
+      alert("Failed to create booking. Please try again.");
+    }
+    setSubmitting(false);
+  };
+
+  const handleUploadPOP = async () => {
+    if (!uploadFile || !bookingResult) return;
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", uploadFile);
+      formData.append("booking_id", bookingResult.id);
+      formData.append("reference", bookingResult.reference);
+
+      const res = await fetch("/api/upload-pop", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setStep("done");
+    } catch {
+      alert("Upload failed. Please try again.");
+    }
+    setUploading(false);
+  };
+
+  const copyRef = () => {
+    if (bookingResult) {
+      navigator.clipboard.writeText(bookingResult.reference);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  // Generate calendar dates (next 30 days, excluding days off)
+  const calendarDates = Array.from({ length: 30 }, (_, i) => addDays(startOfDay(new Date()), i + 1))
+    .filter((d) => !BUSINESS_HOURS.daysOff.includes(d.getDay()));
+
+  const stepIndex = ["service", "hair", "datetime", "details", "payment", "upload", "done"].indexOf(step);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="h-6 w-6 animate-spin text-brand-purple" />
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {/* Page Header */}
+      <section className="bg-brand-cream py-12 lg:py-16 border-b border-brand-cream-dark">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
+          <p className="section-label mb-3">Book Now</p>
+          <h1 className="font-display text-3xl sm:text-4xl font-semibold text-brand-charcoal">
+            Schedule Your Appointment
+          </h1>
+        </div>
+      </section>
+
+      <section className="py-12 sm:py-16 bg-white">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          {/* Progress */}
+          <div className="mb-12">
+            <div className="flex items-center justify-between text-xs mb-3">
+              {["Service", "Hair", "Date & Time", "Details", "Payment", "Upload", "Done"].map(
+                (label, i) => {
+                  const isActive = stepIndex >= i;
+                  const isCurrent = stepIndex === i;
+                  return (
+                    <span
+                      key={label}
+                      className={cn(
+                        "hidden sm:block transition-colors",
+                        isCurrent
+                          ? "text-brand-purple font-semibold"
+                          : isActive
+                          ? "text-brand-purple/60"
+                          : "text-gray-300"
+                      )}
+                    >
+                      {label}
+                    </span>
+                  );
+                }
+              )}
+            </div>
+            <div className="h-0.5 bg-gray-100 overflow-hidden">
+              <div
+                className="h-full bg-brand-purple transition-all duration-500"
+                style={{ width: `${((stepIndex + 1) / 7) * 100}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Step: Service */}
+          {step === "service" && (
+            <div>
+              <h2 className="font-display text-2xl font-semibold text-brand-charcoal mb-2">
+                Choose a Service
+              </h2>
+              <p className="text-sm text-gray-500 mb-8">
+                Select the service you&apos;d like to book
+              </p>
+              <div className="space-y-3">
+                {services.map((s) => (
+                  <button
+                    key={s.id}
+                    onClick={() => selectService(s)}
+                    className={cn(
+                      "w-full text-left p-5 border transition-all duration-200 cursor-pointer flex items-center justify-between group",
+                      booking.service?.id === s.id
+                        ? "border-brand-purple bg-brand-purple/[0.03]"
+                        : "border-gray-200 hover:border-brand-purple/40"
+                    )}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-display text-lg font-semibold text-brand-charcoal group-hover:text-brand-purple transition-colors">
+                        {s.name}
+                      </h3>
+                      <p className="text-sm text-gray-400 mt-1 line-clamp-1">{s.description}</p>
+                      <span className="flex items-center gap-1.5 mt-2 text-xs text-gray-400">
+                        <Clock className="h-3 w-3" />
+                        {s.duration_minutes} min
+                      </span>
+                    </div>
+                    <span className="font-display text-xl font-semibold text-brand-purple whitespace-nowrap ml-6">
+                      {formatCurrency(s.full_price)}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Step: Hair Options */}
+          {step === "hair" && (
+            <div>
+              <button
+                onClick={() => setStep("service")}
+                className="flex items-center gap-1 text-sm text-gray-400 hover:text-brand-purple mb-8 transition-colors"
+              >
+                <ChevronLeft className="h-4 w-4" /> Back
+              </button>
+              <h2 className="font-display text-2xl font-semibold text-brand-charcoal mb-2">
+                Hair Option
+              </h2>
+              <p className="text-sm text-gray-500 mb-8">Choose your preferred hair option</p>
+              <div className="space-y-3">
+                {hairOptions.map((opt) => (
+                  <button
+                    key={opt.id}
+                    onClick={() => selectHairOption(opt)}
+                    className={cn(
+                      "w-full text-left p-5 border transition-all duration-200 cursor-pointer flex items-center justify-between",
+                      booking.hairOption?.id === opt.id
+                        ? "border-brand-purple bg-brand-purple/[0.03]"
+                        : "border-gray-200 hover:border-brand-purple/40"
+                    )}
+                  >
+                    <span className="font-medium text-brand-charcoal">{opt.name}</span>
+                    <span className="text-sm font-semibold text-brand-purple">
+                      {opt.price_delta > 0
+                        ? `+${formatCurrency(opt.price_delta)}`
+                        : opt.price_delta === 0
+                        ? "Included"
+                        : formatCurrency(opt.price_delta)}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Step: Date & Time */}
+          {step === "datetime" && (
+            <div>
+              <button
+                onClick={() =>
+                  setStep(booking.service?.has_hair_options ? "hair" : "service")
+                }
+                className="flex items-center gap-1 text-sm text-gray-400 hover:text-brand-purple mb-8 transition-colors"
+              >
+                <ChevronLeft className="h-4 w-4" /> Back
+              </button>
+              <h2 className="font-display text-2xl font-semibold text-brand-charcoal mb-2">
+                Pick a Date &amp; Time
+              </h2>
+              <p className="text-sm text-gray-500 mb-8">
+                {booking.service?.name} — {booking.service?.duration_minutes} minutes
+              </p>
+
+              {/* Date picker */}
+              <div className="mb-10">
+                <h3 className="label mb-4">Select Date</h3>
+                <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
+                  {calendarDates.slice(0, 14).map((d) => {
+                    const isSelected =
+                      booking.date &&
+                      format(booking.date, "yyyy-MM-dd") === format(d, "yyyy-MM-dd");
+                    return (
+                      <button
+                        key={d.toISOString()}
+                        onClick={() => {
+                          setBooking((prev) => ({ ...prev, date: d, timeSlot: null }));
+                        }}
+                        className={cn(
+                          "flex-shrink-0 flex flex-col items-center border px-4 py-3 text-sm transition-all duration-200",
+                          isSelected
+                            ? "border-brand-purple bg-brand-purple text-white"
+                            : "border-gray-200 hover:border-brand-purple/40"
+                        )}
+                      >
+                        <span className="text-xs font-medium">{format(d, "EEE")}</span>
+                        <span className="text-lg font-bold">{format(d, "d")}</span>
+                        <span className="text-xs">{format(d, "MMM")}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Time slots */}
+              {booking.date && (
+                <div>
+                  <h3 className="label mb-4">Available Times</h3>
+                  {slotsLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="h-5 w-5 animate-spin text-brand-purple" />
+                    </div>
+                  ) : slots.length === 0 ? (
+                    <p className="text-sm text-gray-400 py-4">
+                      No available slots for this date. Try another day.
+                    </p>
+                  ) : (
+                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                      {slots.map((slot) => {
+                        const isSelected =
+                          booking.timeSlot?.label === slot.label;
+                        return (
+                          <button
+                            key={slot.label}
+                            onClick={() =>
+                              setBooking((prev) => ({ ...prev, timeSlot: slot }))
+                            }
+                            className={cn(
+                              "border px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                              isSelected
+                                ? "border-brand-purple bg-brand-purple text-white"
+                                : "border-gray-200 hover:border-brand-purple/40"
+                            )}
+                          >
+                            {slot.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {booking.timeSlot && (
+                <button
+                  onClick={() => setStep("details")}
+                  className="btn-primary w-full mt-10"
+                >
+                  Continue <ArrowRight className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Step: Customer Details */}
+          {step === "details" && (
+            <div>
+              <button
+                onClick={() => setStep("datetime")}
+                className="flex items-center gap-1 text-sm text-gray-400 hover:text-brand-purple mb-8 transition-colors"
+              >
+                <ChevronLeft className="h-4 w-4" /> Back
+              </button>
+              <h2 className="font-display text-2xl font-semibold text-brand-charcoal mb-2">
+                Your Details
+              </h2>
+              <p className="text-sm text-gray-500 mb-8">Tell us who you are</p>
+
+              <div className="space-y-5">
+                <div>
+                  <label className="label">Full Name</label>
+                  <input
+                    type="text"
+                    className="input"
+                    placeholder="Your full name"
+                    value={booking.name}
+                    onChange={(e) =>
+                      setBooking((prev) => ({ ...prev, name: e.target.value }))
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="label">Email</label>
+                  <input
+                    type="email"
+                    className="input"
+                    placeholder="your@email.com"
+                    value={booking.email}
+                    onChange={(e) =>
+                      setBooking((prev) => ({ ...prev, email: e.target.value }))
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="label">Phone</label>
+                  <input
+                    type="tel"
+                    className="input"
+                    placeholder="07X XXX XXXX"
+                    value={booking.phone}
+                    onChange={(e) =>
+                      setBooking((prev) => ({ ...prev, phone: e.target.value }))
+                    }
+                  />
+                </div>
+
+                {/* Payment Choice */}
+                <div>
+                  <label className="label">Payment Option</label>
+                  <div className="grid grid-cols-2 gap-3 mt-1">
+                    <button
+                      onClick={() =>
+                        setBooking((prev) => ({ ...prev, paymentChoice: "DEPOSIT" }))
+                      }
+                      className={cn(
+                        "p-5 border text-center cursor-pointer transition-all duration-200",
+                        booking.paymentChoice === "DEPOSIT"
+                          ? "border-brand-purple bg-brand-purple/[0.03]"
+                          : "border-gray-200 hover:border-brand-purple/40"
+                      )}
+                    >
+                      <p className="font-medium text-brand-charcoal text-sm">Pay Deposit</p>
+                      <p className="font-display text-xl font-semibold text-brand-purple mt-1">
+                        {formatCurrency(
+                          calculateAmountDue(
+                            booking.service!.full_price,
+                            booking.hairOption?.price_delta || 0,
+                            booking.service!.deposit_type,
+                            booking.service!.deposit_value,
+                            "DEPOSIT"
+                          )
+                        )}
+                      </p>
+                    </button>
+                    <button
+                      onClick={() =>
+                        setBooking((prev) => ({ ...prev, paymentChoice: "FULL" }))
+                      }
+                      className={cn(
+                        "p-5 border text-center cursor-pointer transition-all duration-200",
+                        booking.paymentChoice === "FULL"
+                          ? "border-brand-purple bg-brand-purple/[0.03]"
+                          : "border-gray-200 hover:border-brand-purple/40"
+                      )}
+                    >
+                      <p className="font-medium text-brand-charcoal text-sm">Pay Full</p>
+                      <p className="font-display text-xl font-semibold text-brand-purple mt-1">
+                        {formatCurrency(totalPrice)}
+                      </p>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={handleSubmitBooking}
+                disabled={!booking.name || !booking.email || !booking.phone || submitting}
+                className="btn-primary w-full mt-10"
+              >
+                {submitting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  "Confirm & Get Payment Details"
+                )}
+              </button>
+            </div>
+          )}
+
+          {/* Step: Payment Instructions */}
+          {step === "payment" && bookingResult && (
+            <div>
+              <div className="text-center mb-10">
+                <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-brand-gold/10">
+                  <Banknote className="h-7 w-7 text-brand-gold" />
+                </div>
+                <h2 className="font-display text-2xl font-semibold text-brand-charcoal">
+                  Payment Instructions
+                </h2>
+                <p className="text-sm text-gray-500 mt-2">
+                  Please make an EFT payment using the details below
+                </p>
+              </div>
+
+              <div className="bg-gray-50 border border-gray-200 p-6 mb-6">
+                <h3 className="text-xs font-medium uppercase tracking-editorial text-brand-gold mb-5">
+                  Banking Details
+                </h3>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Bank</span>
+                    <span className="font-medium text-brand-charcoal">{BANKING_DETAILS.bankName}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Account Name</span>
+                    <span className="font-medium text-brand-charcoal">{BANKING_DETAILS.accountName}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Account Number</span>
+                    <span className="font-medium text-brand-charcoal">{BANKING_DETAILS.accountNumber}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Branch Code</span>
+                    <span className="font-medium text-brand-charcoal">{BANKING_DETAILS.branchCode}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Account Type</span>
+                    <span className="font-medium text-brand-charcoal">{BANKING_DETAILS.accountType}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border border-brand-cream-dark p-6 mb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-medium uppercase tracking-editorial text-gray-400">Amount Due</span>
+                  <span className="font-display text-2xl font-semibold text-brand-purple">
+                    {formatCurrency(bookingResult.amountDue)}
+                  </span>
+                </div>
+                <div className="h-px bg-brand-cream-dark my-3" />
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium uppercase tracking-editorial text-gray-400">Reference</span>
+                  <button
+                    onClick={copyRef}
+                    className="flex items-center gap-2 text-sm font-mono font-bold text-brand-purple hover:text-brand-purple-dark transition-colors"
+                  >
+                    {bookingResult.reference}
+                    <Copy className="h-3.5 w-3.5" />
+                    {copied && (
+                      <span className="text-xs text-green-600">Copied!</span>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <p className="text-sm text-gray-400 text-center mb-8">
+                After making payment, upload your Proof of Payment below.
+              </p>
+
+              <button onClick={() => setStep("upload")} className="btn-primary w-full">
+                Upload Proof of Payment
+              </button>
+            </div>
+          )}
+
+          {/* Step: Upload POP */}
+          {step === "upload" && bookingResult && (
+            <div>
+              <button
+                onClick={() => setStep("payment")}
+                className="flex items-center gap-1 text-sm text-gray-400 hover:text-brand-purple mb-8 transition-colors"
+              >
+                <ChevronLeft className="h-4 w-4" /> Back to Payment Details
+              </button>
+              <div className="text-center mb-10">
+                <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-brand-purple/10">
+                  <Upload className="h-7 w-7 text-brand-purple" />
+                </div>
+                <h2 className="font-display text-2xl font-semibold text-brand-charcoal">
+                  Upload Proof of Payment
+                </h2>
+                <p className="text-sm text-gray-500 mt-2">
+                  Accepted: PDF, JPG, PNG (max 10MB)
+                </p>
+              </div>
+
+              <div className="border border-brand-cream-dark p-6">
+                <label className="block">
+                  <div className="flex flex-col items-center justify-center border border-dashed border-gray-300 p-10 hover:border-brand-purple transition-colors duration-200 cursor-pointer">
+                    <Upload className="h-8 w-8 text-gray-300 mb-3" />
+                    <p className="text-sm text-gray-500">
+                      {uploadFile ? uploadFile.name : "Click to select file"}
+                    </p>
+                  </div>
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
+                  />
+                </label>
+              </div>
+
+              <button
+                onClick={handleUploadPOP}
+                disabled={!uploadFile || uploading}
+                className="btn-primary w-full mt-8"
+              >
+                {uploading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  "Submit Proof of Payment"
+                )}
+              </button>
+            </div>
+          )}
+
+          {/* Step: Done */}
+          {step === "done" && (
+            <div className="text-center py-16">
+              <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-50">
+                <CheckCircle className="h-10 w-10 text-green-500" />
+              </div>
+              <h2 className="font-display text-3xl font-semibold text-brand-charcoal mb-4">
+                Thank You!
+              </h2>
+              <p className="text-gray-500 max-w-md mx-auto mb-3 leading-relaxed">
+                Your proof of payment has been submitted. We&apos;ll review it and
+                send you a confirmation email once your booking is approved.
+              </p>
+              {bookingResult && (
+                <p className="text-sm text-gray-400 mb-10">
+                  Reference: <strong className="text-brand-purple">{bookingResult.reference}</strong>
+                </p>
+              )}
+              <button onClick={() => router.push("/")} className="btn-secondary">
+                Back to Home
+              </button>
+            </div>
+          )}
+        </div>
+      </section>
+    </>
+  );
+}

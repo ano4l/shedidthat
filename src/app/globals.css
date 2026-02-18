@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-brand-cream text-brand-charcoal antialiased;
+  }
+  ::selection {
+    background: rgba(124, 58, 237, 0.15);
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 bg-brand-purple px-7 py-3.5 text-sm font-medium tracking-wide text-white transition-all duration-300 hover:bg-brand-purple-dark focus:outline-none focus:ring-2 focus:ring-brand-purple/30 focus:ring-offset-2 focus:ring-offset-brand-cream disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 border border-brand-purple px-7 py-3.5 text-sm font-medium tracking-wide text-brand-purple transition-all duration-300 hover:bg-brand-purple hover:text-white focus:outline-none focus:ring-2 focus:ring-brand-purple/30 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-gold {
+    @apply inline-flex items-center justify-center gap-2 bg-brand-gold px-7 py-3.5 text-sm font-medium tracking-wide text-white transition-all duration-300 hover:bg-brand-gold-dark focus:outline-none focus:ring-2 focus:ring-brand-gold/30 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .card {
+    @apply bg-white p-6 shadow-soft border border-brand-cream-dark/60;
+  }
+  .card-elevated {
+    @apply bg-white p-8 shadow-elevated;
+  }
+  .input {
+    @apply w-full border border-gray-200 bg-white px-4 py-3 text-sm transition-all duration-200 placeholder:text-gray-400 focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/10;
+  }
+  .label {
+    @apply block text-xs font-medium uppercase tracking-editorial text-gray-500 mb-2;
+  }
+  .section-label {
+    @apply text-xs font-medium uppercase tracking-editorial text-brand-purple;
+  }
+  .section-heading {
+    @apply font-display text-4xl font-semibold text-brand-charcoal sm:text-5xl leading-[1.1];
+  }
+  .section-subheading {
+    @apply mt-4 text-base text-gray-500 leading-relaxed;
+  }
+  .divider {
+    @apply w-12 h-px bg-brand-purple;
+  }
+  .divider-wide {
+    @apply w-full h-px bg-brand-cream-dark;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

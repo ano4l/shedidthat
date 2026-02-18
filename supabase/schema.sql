@@ -1,0 +1,163 @@
+-- ============================================
+-- SheDidThat — Database Schema
+-- Run this in your Supabase SQL Editor
+-- ============================================
+
+-- Enable UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- ============================================
+-- SERVICES
+-- ============================================
+CREATE TABLE services (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  duration_minutes INTEGER NOT NULL DEFAULT 60,
+  full_price NUMERIC(10,2) NOT NULL DEFAULT 0,
+  deposit_type TEXT NOT NULL DEFAULT 'PERCENTAGE' CHECK (deposit_type IN ('PERCENTAGE', 'FIXED')),
+  deposit_value NUMERIC(10,2) NOT NULL DEFAULT 50,
+  has_hair_options BOOLEAN NOT NULL DEFAULT false,
+  image_url TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- ============================================
+-- HAIR OPTIONS
+-- ============================================
+CREATE TABLE hair_options (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  service_id UUID NOT NULL REFERENCES services(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  price_delta NUMERIC(10,2) NOT NULL DEFAULT 0
+);
+
+-- ============================================
+-- BOOKING REQUESTS
+-- ============================================
+CREATE TABLE booking_requests (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  customer_name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  phone TEXT NOT NULL,
+  service_id UUID NOT NULL REFERENCES services(id),
+  hair_option_id UUID REFERENCES hair_options(id),
+  start_time TIMESTAMPTZ NOT NULL,
+  end_time TIMESTAMPTZ NOT NULL,
+  payment_choice TEXT NOT NULL DEFAULT 'DEPOSIT' CHECK (payment_choice IN ('DEPOSIT', 'FULL')),
+  amount_due NUMERIC(10,2) NOT NULL DEFAULT 0,
+  status TEXT NOT NULL DEFAULT 'REQUESTED' CHECK (status IN ('REQUESTED', 'POP_UPLOADED', 'CONFIRMED', 'REJECTED', 'CANCELLED')),
+  reference TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- ============================================
+-- PAYMENT PROOFS
+-- ============================================
+CREATE TABLE payment_proofs (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  booking_request_id UUID NOT NULL REFERENCES booking_requests(id) ON DELETE CASCADE,
+  file_url TEXT NOT NULL,
+  reference_used TEXT NOT NULL,
+  uploaded_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  verification_status TEXT NOT NULL DEFAULT 'PENDING' CHECK (verification_status IN ('PENDING', 'APPROVED', 'REJECTED')),
+  review_note TEXT
+);
+
+-- ============================================
+-- CONFIRMED BOOKINGS
+-- ============================================
+CREATE TABLE confirmed_bookings (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  booking_request_id UUID NOT NULL REFERENCES booking_requests(id) ON DELETE CASCADE,
+  start_time TIMESTAMPTZ NOT NULL,
+  end_time TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Prevent overlapping confirmed bookings
+CREATE OR REPLACE FUNCTION check_no_overlap()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM confirmed_bookings
+    WHERE id != NEW.id
+      AND start_time < NEW.end_time
+      AND end_time > NEW.start_time
+  ) THEN
+    RAISE EXCEPTION 'Overlapping confirmed booking exists';
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER prevent_overlap
+  BEFORE INSERT OR UPDATE ON confirmed_bookings
+  FOR EACH ROW EXECUTE FUNCTION check_no_overlap();
+
+-- ============================================
+-- INDEXES
+-- ============================================
+CREATE INDEX idx_booking_requests_status ON booking_requests(status);
+CREATE INDEX idx_booking_requests_start_time ON booking_requests(start_time);
+CREATE INDEX idx_confirmed_bookings_start_time ON confirmed_bookings(start_time);
+CREATE INDEX idx_confirmed_bookings_end_time ON confirmed_bookings(end_time);
+CREATE INDEX idx_payment_proofs_booking ON payment_proofs(booking_request_id);
+
+-- ============================================
+-- ROW LEVEL SECURITY (RLS)
+-- ============================================
+ALTER TABLE services ENABLE ROW LEVEL SECURITY;
+ALTER TABLE hair_options ENABLE ROW LEVEL SECURITY;
+ALTER TABLE booking_requests ENABLE ROW LEVEL SECURITY;
+ALTER TABLE payment_proofs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE confirmed_bookings ENABLE ROW LEVEL SECURITY;
+
+-- Public read for services and hair_options
+CREATE POLICY "Public can read services" ON services FOR SELECT USING (true);
+CREATE POLICY "Public can read hair_options" ON hair_options FOR SELECT USING (true);
+
+-- Public can read confirmed bookings (for availability check)
+CREATE POLICY "Public can read confirmed_bookings" ON confirmed_bookings FOR SELECT USING (true);
+
+-- Public can read booking_requests (for availability soft-block)
+CREATE POLICY "Public can read booking_requests" ON booking_requests FOR SELECT USING (true);
+
+-- Service role can do everything (used by server-side supabaseAdmin)
+CREATE POLICY "Service role full access services" ON services FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Service role full access hair_options" ON hair_options FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Service role full access booking_requests" ON booking_requests FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Service role full access payment_proofs" ON payment_proofs FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Service role full access confirmed_bookings" ON confirmed_bookings FOR ALL USING (true) WITH CHECK (true);
+
+-- ============================================
+-- SEED DATA — Sample Services
+-- ============================================
+INSERT INTO services (name, description, duration_minutes, full_price, deposit_type, deposit_value, has_hair_options) VALUES
+  ('Standard Cornrows (10)', 'Classic cornrow braids — clean, neat, and timeless. Standard 10 cornrows.', 120, 350, 'PERCENTAGE', 50, false),
+  ('Feed-in Cornrows', 'Seamless feed-in braids for a natural, sleek look. Includes styling.', 150, 500, 'PERCENTAGE', 50, true),
+  ('Box Braids (Medium)', 'Medium-sized box braids. Versatile and protective.', 240, 800, 'PERCENTAGE', 50, true),
+  ('Box Braids (Small)', 'Small box braids for a fuller, more detailed look.', 300, 1200, 'PERCENTAGE', 50, true),
+  ('Knotless Braids (Medium)', 'Pain-free knotless braids. Lightweight and natural-looking.', 240, 900, 'PERCENTAGE', 50, true),
+  ('Knotless Braids (Small)', 'Small knotless braids — detailed and elegant.', 300, 1400, 'PERCENTAGE', 50, true),
+  ('Faux Locs (Medium)', 'Bohemian or classic faux locs. Trendy and protective.', 300, 1000, 'PERCENTAGE', 50, true),
+  ('Tribal / Fulani Braids', 'Intricate tribal-inspired braids with beads and accessories.', 180, 600, 'PERCENTAGE', 50, true),
+  ('Afro Styling', 'Natural afro wash, condition, and style. Includes blow-out or twist-out.', 120, 400, 'PERCENTAGE', 50, false),
+  ('Crochet Braids', 'Quick and versatile crochet install. Multiple style options.', 120, 500, 'PERCENTAGE', 50, true);
+
+-- Seed hair options for services that have them
+INSERT INTO hair_options (service_id, name, price_delta)
+SELECT id, 'Bring Your Own Hair', 0 FROM services WHERE has_hair_options = true
+UNION ALL
+SELECT id, 'Salon Synthetic Hair', 150 FROM services WHERE has_hair_options = true
+UNION ALL
+SELECT id, 'Salon Human Hair', 400 FROM services WHERE has_hair_options = true
+UNION ALL
+SELECT id, 'Not Sure / Consult Me', 0 FROM services WHERE has_hair_options = true;
+
+-- ============================================
+-- STORAGE BUCKET
+-- ============================================
+-- Run this separately or via Supabase dashboard:
+-- Create a public bucket called "payment-proofs"
+-- INSERT INTO storage.buckets (id, name, public) VALUES ('payment-proofs', 'payment-proofs', true);
