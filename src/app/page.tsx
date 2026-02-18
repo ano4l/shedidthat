@@ -176,12 +176,12 @@ export default function HomePage() {
       <section className="py-24 lg:py-32 bg-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <p className="section-label mb-4">Our Products</p>
+            <p className="section-label mb-4">Our Services</p>
             <h2 className="section-heading">
-              Shop Afro Wigs
+              What We Offer
             </h2>
             <p className="section-subheading max-w-lg mx-auto">
-              Premium quality afro wigs in three stunning shades. Natural look, comfortable fit, all at one great price.
+              Three signature services. Choose your style and we&apos;ll handle the rest.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
@@ -214,7 +214,7 @@ export default function HomePage() {
                     href={svc.href}
                     className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-purple hover:text-brand-purple-dark transition-colors"
                   >
-                    Buy Now <ArrowRight className="h-3.5 w-3.5" />
+                    Book Now <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
               </div>
