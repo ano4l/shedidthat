@@ -16,17 +16,17 @@ export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+    <header className="sticky top-0 z-50 border-b border-white/20" style={{background:'rgba(255,255,255,0.08)',backdropFilter:'blur(60px) saturate(200%)',WebkitBackdropFilter:'blur(60px) saturate(200%)',boxShadow:'0 4px 30px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.5), inset 0 -1px 0 rgba(255,255,255,0.1)'}}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-20 items-center justify-between">
+        <div className="flex h-24 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center">
             <Image
               src="/images/logo.png"
               alt="She Did That"
-              width={200}
-              height={75}
-              className="h-16 w-auto object-contain"
+              width={280}
+              height={105}
+              className="h-24 w-auto object-contain"
               priority
             />
           </Link>
@@ -37,12 +37,12 @@ export function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm font-medium text-gray-600 transition-colors duration-200 hover:text-brand-purple"
+                className="text-sm font-medium text-brand-muted transition-colors duration-200 hover:text-brand-rose"
               >
                 {link.label}
               </Link>
             ))}
-            <Link href="/booking" className="btn-primary text-xs py-3 px-6">
+            <Link href="/booking" className="btn-gold text-xs py-3 px-6">
               Book Appointment
             </Link>
           </nav>
@@ -50,7 +50,7 @@ export function Header() {
           {/* Mobile Toggle */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden p-2 text-brand-purple"
+            className="md:hidden p-2 text-brand-rose"
             aria-label="Toggle menu"
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -59,13 +59,13 @@ export function Header() {
 
         {/* Mobile Nav */}
         {mobileOpen && (
-          <nav className="md:hidden pb-6 pt-2 space-y-1">
+          <nav className="md:hidden pb-6 pt-2 space-y-1 border-t border-brand-charcoal/[0.06]">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
-                className="block text-sm font-medium text-gray-600 py-3 px-2 hover:text-brand-purple transition-colors"
+                className="block text-sm font-medium text-brand-muted py-3 px-2 hover:text-brand-rose transition-colors"
               >
                 {link.label}
               </Link>
@@ -74,7 +74,7 @@ export function Header() {
               <Link
                 href="/booking"
                 onClick={() => setMobileOpen(false)}
-                className="btn-primary w-full text-center text-xs py-3"
+                className="btn-gold w-full text-center text-xs py-3"
               >
                 Book Appointment
               </Link>

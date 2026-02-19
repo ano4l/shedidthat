@@ -30,8 +30,11 @@ export default async function ServicesPage() {
   return (
     <>
       {/* Header */}
-      <section className="bg-brand-cream py-20 lg:py-28">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+      <section className="relative py-20 lg:py-28 overflow-hidden" style={{background:'linear-gradient(135deg, #F5EDE8 0%, #FBF8F6 30%, #EDE4DE 100%)'}}>
+        <div className="absolute inset-0 bg-gradient-to-br from-brand-rose/[0.08] via-transparent to-brand-gold/[0.06]" />
+        <div className="absolute top-10 -right-32 w-80 h-80 rounded-full bg-brand-rose/[0.04] blur-3xl" />
+        <div className="absolute -bottom-20 -left-32 w-80 h-80 rounded-full bg-brand-gold/[0.04] blur-3xl" />
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center relative">
           <p className="section-label mb-4">Our Menu</p>
           <h1 className="section-heading mb-4">
             Price Guide
@@ -43,16 +46,16 @@ export default async function ServicesPage() {
       </section>
 
       {/* Services Grid */}
-      <section className="py-20 lg:py-28 bg-white">
+      <section className="py-20 lg:py-28 relative" style={{background:'linear-gradient(180deg, #F0E8E3 0%, #EDE4DE 50%, #F5EDE8 100%)'}}>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {services.length === 0 ? (
-            <div className="card text-center py-16">
-              <p className="text-gray-500">
+            <div className="glass text-center py-16">
+              <p className="text-brand-muted">
                 Services are being updated. Please check back soon!
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-brand-cream-dark">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {services.map((service) => {
                 const depositAmount =
                   service.deposit_type === "PERCENTAGE"
@@ -62,22 +65,22 @@ export default async function ServicesPage() {
                 return (
                   <div
                     key={service.id}
-                    className="bg-white p-8 lg:p-10 group hover:bg-brand-gold/[0.02] transition-colors duration-200"
+                    className="glass p-8 lg:p-10 group hover:shadow-glass-rose hover:-translate-y-1 transition-all duration-500"
                   >
                     <div className="flex items-start justify-between mb-3">
-                      <h3 className="font-display text-2xl font-semibold text-brand-charcoal group-hover:text-brand-purple transition-colors duration-200">
+                      <h3 className="font-display text-2xl font-semibold text-brand-charcoal group-hover:text-brand-rose transition-colors duration-200">
                         {service.name}
                       </h3>
-                      <span className="font-display text-2xl font-semibold text-brand-gold whitespace-nowrap ml-4">
+                      <span className="font-display text-2xl font-semibold text-brand-rose whitespace-nowrap ml-4">
                         {formatCurrency(service.full_price)}
                       </span>
                     </div>
                     <div className="divider mb-4" />
-                    <p className="text-sm text-gray-500 mb-5 leading-relaxed line-clamp-2">
+                    <p className="text-sm text-brand-muted mb-5 leading-relaxed line-clamp-2">
                       {service.description}
                     </p>
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4 text-xs text-gray-400">
+                      <div className="flex items-center gap-4 text-xs text-brand-muted/60">
                         <span className="flex items-center gap-1.5">
                           <Clock className="h-3.5 w-3.5" />
                           {service.duration_minutes} min
@@ -88,7 +91,7 @@ export default async function ServicesPage() {
                       </div>
                       <Link
                         href={`/booking?service=${service.id}`}
-                        className="inline-flex items-center gap-1.5 text-xs font-medium text-brand-purple hover:text-brand-purple-dark transition-colors"
+                        className="inline-flex items-center gap-1.5 text-xs font-medium text-brand-rose hover:text-brand-rose-dark transition-colors"
                       >
                         Book <ArrowRight className="h-3.5 w-3.5" />
                       </Link>
@@ -100,7 +103,7 @@ export default async function ServicesPage() {
           )}
 
           <div className="text-center mt-16">
-            <Link href="/booking" className="btn-primary px-10 py-4">
+            <Link href="/booking" className="btn-gold px-10 py-4">
               Book an Appointment
             </Link>
           </div>

@@ -51,7 +51,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="h-6 w-6 animate-spin text-brand-purple" />
+        <Loader2 className="h-6 w-6 animate-spin text-brand-rose" />
       </div>
     );
   }
@@ -59,15 +59,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (!session) {
     return (
       <div className="flex items-center justify-center min-h-[60vh] px-4">
-        <div className="bg-white border border-brand-cream-dark p-8 sm:p-10 max-w-md w-full">
+        <div className="glass rounded-lg p-8 sm:p-10 max-w-md w-full">
           <div className="text-center mb-8">
-            <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-brand-purple/10">
-              <Lock className="h-6 w-6 text-brand-purple" />
+            <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-brand-rose/10">
+              <Lock className="h-6 w-6 text-brand-rose" />
             </div>
             <h1 className="font-display text-2xl font-semibold text-brand-charcoal">
               Admin Login
             </h1>
-            <p className="text-sm text-gray-500 mt-2">Sign in to manage bookings</p>
+            <p className="text-sm text-brand-muted mt-2">Sign in to manage bookings</p>
           </div>
           <form onSubmit={handleLogin} className="space-y-5">
             <div>
@@ -90,8 +90,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 required
               />
             </div>
-            {error && <p className="text-sm text-red-600">{error}</p>}
-            <button type="submit" disabled={loginLoading} className="btn-primary w-full">
+            {error && <p className="text-sm text-red-500">{error}</p>}
+            <button type="submit" disabled={loginLoading} className="btn-gold w-full">
               {loginLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign In"}
             </button>
           </form>
@@ -102,15 +102,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const adminTabs = [
     { href: "/admin", label: "Bookings" },
+    { href: "/admin/clients", label: "Clients & Sales" },
     { href: "/admin/services", label: "Services" },
   ];
 
   return (
     <div>
-      <div className="bg-brand-purple px-4 py-3">
+      <div className="bg-white/70 backdrop-blur-2xl border-b border-brand-charcoal/[0.06] px-4 py-3">
         <div className="mx-auto max-w-7xl flex items-center justify-between">
           <div className="flex items-center gap-6">
-            <h2 className="text-sm font-medium text-white/80">Admin</h2>
+            <h2 className="text-sm font-medium text-brand-rose">Admin</h2>
             <nav className="flex items-center gap-1">
               {adminTabs.map((tab) => (
                 <Link
@@ -119,8 +120,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   className={cn(
                     "px-3 py-1.5 text-xs font-medium rounded transition-colors",
                     pathname === tab.href
-                      ? "bg-white/20 text-white"
-                      : "text-white/50 hover:text-white hover:bg-white/10"
+                      ? "bg-brand-rose/10 text-brand-rose"
+                      : "text-brand-muted hover:text-brand-rose hover:bg-brand-rose/5"
                   )}
                 >
                   {tab.label}
@@ -130,7 +131,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
           <button
             onClick={handleLogout}
-            className="text-xs text-white/50 hover:text-white transition-colors"
+            className="text-xs text-brand-muted/50 hover:text-brand-rose transition-colors"
           >
             Sign Out
           </button>

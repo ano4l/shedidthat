@@ -181,7 +181,7 @@ export default function AdminServicesPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16">
-        <Loader2 className="h-6 w-6 animate-spin text-brand-purple" />
+        <Loader2 className="h-6 w-6 animate-spin text-brand-rose" />
       </div>
     );
   }
@@ -203,12 +203,12 @@ export default function AdminServicesPage() {
 
         {/* New Service Form */}
         {showNewService && (
-          <div className="border border-brand-gold/30 bg-brand-gold/[0.02] p-6 mb-8">
+          <div className="glass-rose p-6 mb-8">
             <div className="flex items-center justify-between mb-5">
               <h3 className="font-display text-lg font-semibold text-brand-charcoal">
                 New Service
               </h3>
-              <button onClick={() => setShowNewService(false)} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setShowNewService(false)} className="text-brand-muted/40 hover:text-brand-muted">
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -281,9 +281,9 @@ export default function AdminServicesPage() {
                   id="has_hair_options"
                   checked={newService.has_hair_options}
                   onChange={(e) => setNewService((p) => ({ ...p, has_hair_options: e.target.checked }))}
-                  className="h-4 w-4 accent-brand-purple"
+                  className="h-4 w-4 accent-brand-rose"
                 />
-                <label htmlFor="has_hair_options" className="text-sm text-gray-600">
+                <label htmlFor="has_hair_options" className="text-sm text-brand-muted">
                   This service has hair type options (e.g. different lengths/styles at different prices)
                 </label>
               </div>
@@ -300,8 +300,8 @@ export default function AdminServicesPage() {
 
         {/* Services List */}
         {services.length === 0 ? (
-          <div className="border border-gray-200 text-center py-16">
-            <p className="text-gray-400 mb-4">No services yet</p>
+          <div className="glass text-center py-16">
+            <p className="text-brand-muted mb-4">No services yet</p>
             <button
               onClick={() => setShowNewService(true)}
               className="btn-primary text-xs py-2 px-4"
@@ -316,7 +316,7 @@ export default function AdminServicesPage() {
               const svcHairOptions = hairOptions[svc.id] || [];
 
               return (
-                <div key={svc.id} className="border border-gray-200">
+                <div key={svc.id} className="glass overflow-hidden">
                   {/* Service Row */}
                   <div className="p-5 flex items-center justify-between">
                     <div
@@ -325,9 +325,9 @@ export default function AdminServicesPage() {
                     >
                       {svc.has_hair_options ? (
                         isExpanded ? (
-                          <ChevronDown className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                          <ChevronDown className="h-4 w-4 text-brand-muted/40 flex-shrink-0" />
                         ) : (
-                          <ChevronRight className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                          <ChevronRight className="h-4 w-4 text-brand-muted/40 flex-shrink-0" />
                         )
                       ) : (
                         <div className="w-4" />
@@ -338,12 +338,12 @@ export default function AdminServicesPage() {
                             {svc.name}
                           </h3>
                           {svc.has_hair_options && (
-                            <span className="text-[10px] font-medium uppercase tracking-wider text-brand-gold bg-brand-gold/10 px-2 py-0.5">
+                            <span className="text-[10px] font-medium uppercase tracking-wider text-brand-rose bg-brand-rose/10 px-2 py-0.5 rounded">
                               Hair Options
                             </span>
                           )}
                         </div>
-                        <div className="flex items-center gap-4 mt-1 text-xs text-gray-400">
+                        <div className="flex items-center gap-4 mt-1 text-xs text-brand-muted/60">
                           <span>{svc.duration_minutes} min</span>
                           <span>
                             Deposit: {svc.deposit_type === "PERCENTAGE" ? `${svc.deposit_value}%` : formatCurrency(svc.deposit_value)}
@@ -355,12 +355,12 @@ export default function AdminServicesPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-4 ml-4">
-                      <span className="font-display text-xl font-semibold text-brand-gold">
+                      <span className="font-display text-xl font-semibold text-brand-rose">
                         {formatCurrency(svc.full_price)}
                       </span>
                       <button
                         onClick={() => handleDeleteService(svc.id)}
-                        className="text-gray-300 hover:text-red-500 transition-colors"
+                        className="text-brand-muted/30 hover:text-red-500 transition-colors"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -369,31 +369,31 @@ export default function AdminServicesPage() {
 
                   {/* Hair Options Panel */}
                   {isExpanded && svc.has_hair_options && (
-                    <div className="border-t border-gray-100 bg-gray-50/50 p-5">
+                    <div className="border-t border-brand-charcoal/[0.06] bg-brand-cream/50 p-5">
                       <div className="flex items-center justify-between mb-4">
-                        <h4 className="text-xs font-medium uppercase tracking-editorial text-brand-gold">
+                        <h4 className="text-xs font-medium uppercase tracking-editorial text-brand-rose">
                           Hair Options for {svc.name}
                         </h4>
                         <button
                           onClick={() => setHairOptionServiceId(hairOptionServiceId === svc.id ? null : svc.id)}
-                          className="text-xs text-brand-purple hover:text-brand-purple-dark transition-colors flex items-center gap-1"
+                          className="text-xs text-brand-rose hover:text-brand-rose-light transition-colors flex items-center gap-1"
                         >
                           <Plus className="h-3 w-3" /> Add Option
                         </button>
                       </div>
 
                       {svcHairOptions.length === 0 ? (
-                        <p className="text-sm text-gray-400 py-2">No hair options yet. Add one above.</p>
+                        <p className="text-sm text-brand-muted py-2">No hair options yet. Add one above.</p>
                       ) : (
                         <div className="space-y-2">
                           {svcHairOptions.map((opt) => (
                             <div
                               key={opt.id}
-                              className="flex items-center justify-between bg-white border border-gray-100 px-4 py-3"
+                              className="flex items-center justify-between bg-white/60 border border-brand-charcoal/[0.06] rounded-xl px-4 py-3"
                             >
                               <span className="text-sm font-medium text-brand-charcoal">{opt.name}</span>
                               <div className="flex items-center gap-3">
-                                <span className="text-sm font-semibold text-brand-gold">
+                                <span className="text-sm font-semibold text-brand-rose">
                                   {opt.price_delta > 0
                                     ? `+${formatCurrency(opt.price_delta)}`
                                     : opt.price_delta === 0
@@ -402,7 +402,7 @@ export default function AdminServicesPage() {
                                 </span>
                                 <button
                                   onClick={() => handleDeleteHairOption(opt.id)}
-                                  className="text-gray-300 hover:text-red-500 transition-colors"
+                                  className="text-brand-muted/30 hover:text-red-500 transition-colors"
                                 >
                                   <Trash2 className="h-3.5 w-3.5" />
                                 </button>
@@ -447,7 +447,7 @@ export default function AdminServicesPage() {
                               setHairOptionServiceId(null);
                               setNewHairOption(emptyHairOptionForm);
                             }}
-                            className="text-gray-400 hover:text-gray-600 py-2.5"
+                            className="text-brand-muted/40 hover:text-brand-muted py-2.5"
                           >
                             <X className="h-4 w-4" />
                           </button>

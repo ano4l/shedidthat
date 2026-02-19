@@ -26,6 +26,7 @@ interface AdminBooking {
   status: BookingStatus;
   reference: string;
   created_at: string;
+  juice_preference: string | null;
   services: { name: string; duration_minutes: number } | null;
   hair_options: { name: string } | null;
   payment_proofs: {
@@ -98,7 +99,7 @@ export default function AdminPage() {
           </h1>
           <button
             onClick={fetchBookings}
-            className="flex items-center gap-2 text-sm text-gray-400 hover:text-brand-purple transition-colors"
+            className="flex items-center gap-2 text-sm text-brand-muted hover:text-brand-rose transition-colors"
           >
             <RefreshCw className="h-4 w-4" /> Refresh
           </button>
@@ -111,10 +112,10 @@ export default function AdminPage() {
               key={f}
               onClick={() => setFilter(f)}
               className={cn(
-                "px-4 py-2 text-xs font-medium whitespace-nowrap transition-all duration-200",
+                "px-4 py-2 text-xs font-medium whitespace-nowrap transition-all duration-200 rounded",
                 filter === f
-                  ? "bg-brand-purple text-white"
-                  : "bg-white border border-gray-200 text-gray-500 hover:border-brand-purple/40"
+                  ? "bg-brand-rose text-white"
+                  : "border border-brand-charcoal/[0.08] text-brand-muted hover:border-brand-rose/30"
               )}
             >
               {f === "all" ? "All" : BOOKING_STATUSES[f as BookingStatus]?.label || f}
@@ -124,16 +125,16 @@ export default function AdminPage() {
 
         {loading ? (
           <div className="flex items-center justify-center py-16">
-            <Loader2 className="h-6 w-6 animate-spin text-brand-purple" />
+            <Loader2 className="h-6 w-6 animate-spin text-brand-rose" />
           </div>
         ) : bookings.length === 0 ? (
-          <div className="bg-white border border-gray-200 text-center py-16">
-            <p className="text-gray-400">No bookings found</p>
+          <div className="glass text-center py-16">
+            <p className="text-brand-muted">No bookings found</p>
           </div>
         ) : (
           <div className="space-y-3">
             {bookings.map((b) => (
-              <div key={b.id} className="bg-white border border-gray-200 p-5">
+              <div key={b.id} className="glass p-5">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-2">
@@ -149,14 +150,14 @@ export default function AdminPage() {
                         {BOOKING_STATUSES[b.status]?.label}
                       </span>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 text-sm text-gray-500">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 text-sm text-brand-muted">
                       <span>{b.services?.name || "—"}</span>
                       <span>{formatDateTime(b.start_time)}</span>
                       <span>
                         {formatCurrency(b.amount_due)} ({b.payment_choice})
                       </span>
                     </div>
-                    <p className="text-xs text-gray-400 mt-2">
+                    <p className="text-xs text-brand-muted/50 mt-2">
                       Ref: {b.reference} | {b.email} | {b.phone}
                     </p>
                   </div>
@@ -166,7 +167,7 @@ export default function AdminPage() {
                         href={b.payment_proofs[0].file_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1 text-xs text-brand-purple hover:text-brand-purple-dark transition-colors"
+                        className="flex items-center gap-1 text-xs text-brand-rose hover:text-brand-rose-light transition-colors"
                       >
                         <FileText className="h-3.5 w-3.5" />
                         View POP
@@ -193,48 +194,56 @@ export default function AdminPage() {
 
         {/* Review Modal */}
         {selectedBooking && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-            <div className="bg-white border border-gray-200 p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-xl p-4">
+            <div className="bg-white/90 backdrop-blur-2xl border border-white/80 shadow-glass-lg rounded-2xl p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto">
               <h2 className="font-display text-xl font-semibold text-brand-charcoal mb-6">
                 Review Booking
               </h2>
               <div className="space-y-3 text-sm mb-8">
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Customer</span>
+                  <span className="text-brand-muted">Customer</span>
                   <span className="font-medium text-brand-charcoal">{selectedBooking.customer_name}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Service</span>
+                  <span className="text-brand-muted">Service</span>
                   <span className="font-medium text-brand-charcoal">
                     {selectedBooking.services?.name}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Date &amp; Time</span>
+                  <span className="text-brand-muted">Date &amp; Time</span>
                   <span className="font-medium text-brand-charcoal">
                     {formatDateTime(selectedBooking.start_time)}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Amount</span>
-                  <span className="font-medium text-brand-gold">
+                  <span className="text-brand-muted">Amount</span>
+                  <span className="font-medium text-brand-rose">
                     {formatCurrency(selectedBooking.amount_due)}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Reference</span>
+                  <span className="text-brand-muted">Reference</span>
                   <span className="font-mono font-medium text-brand-charcoal">
                     {selectedBooking.reference}
                   </span>
                 </div>
+                {selectedBooking.juice_preference && (
+                  <div className="flex justify-between">
+                    <span className="text-brand-muted">Preferred Juice</span>
+                    <span className="font-medium text-brand-charcoal">
+                      {selectedBooking.juice_preference}
+                    </span>
+                  </div>
+                )}
                 {selectedBooking.payment_proofs?.length > 0 && (
                   <div>
-                    <span className="text-gray-400">Proof of Payment</span>
+                    <span className="text-brand-muted">Proof of Payment</span>
                     <a
                       href={selectedBooking.payment_proofs[0].file_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block mt-1 text-brand-purple hover:text-brand-purple-dark transition-colors"
+                      className="block mt-1 text-brand-rose hover:text-brand-rose-light transition-colors"
                     >
                       View uploaded file
                       <ExternalLink className="inline h-3 w-3 ml-1" />
@@ -259,7 +268,7 @@ export default function AdminPage() {
                     handleAction(selectedBooking.id, "APPROVE")
                   }
                   disabled={actionLoading}
-                  className="flex-1 inline-flex items-center justify-center gap-2 bg-green-600 px-6 py-3 text-sm font-medium text-white transition-all hover:bg-green-700 disabled:opacity-50"
+                  className="flex-1 inline-flex items-center justify-center gap-2 bg-green-600/80 px-6 py-3 text-sm font-medium text-white rounded transition-all hover:bg-green-600 disabled:opacity-50"
                 >
                   {actionLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -274,7 +283,7 @@ export default function AdminPage() {
                     handleAction(selectedBooking.id, "REJECT")
                   }
                   disabled={actionLoading}
-                  className="flex-1 inline-flex items-center justify-center gap-2 bg-red-600 px-6 py-3 text-sm font-medium text-white transition-all hover:bg-red-700 disabled:opacity-50"
+                  className="flex-1 inline-flex items-center justify-center gap-2 bg-red-600/80 px-6 py-3 text-sm font-medium text-white rounded transition-all hover:bg-red-600 disabled:opacity-50"
                 >
                   {actionLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -287,7 +296,7 @@ export default function AdminPage() {
               </div>
               <button
                 onClick={() => setSelectedBooking(null)}
-                className="w-full mt-4 text-sm text-gray-400 hover:text-brand-charcoal py-2 transition-colors"
+                className="w-full mt-4 text-sm text-brand-muted hover:text-brand-charcoal py-2 transition-colors"
               >
                 Cancel
               </button>

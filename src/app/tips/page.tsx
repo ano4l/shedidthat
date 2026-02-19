@@ -1,143 +1,214 @@
-import { Droplets, Moon, Shield, Scissors, Wind, Heart, PlayCircle } from "lucide-react";
-
-const tips = [
-  {
-    icon: Moon,
-    title: "Protect Your Hair at Night",
-    description:
-      "Always wrap your hair with a satin or silk scarf before bed. This reduces friction, prevents frizz, and helps your style last longer. A satin pillowcase is also a great alternative.",
-  },
-  {
-    icon: Droplets,
-    title: "Keep Your Scalp Moisturised",
-    description:
-      "Use a lightweight oil or scalp spray every 2-3 days to keep your scalp hydrated. Focus on the roots and gently massage to promote blood circulation and healthy growth.",
-  },
-  {
-    icon: Shield,
-    title: "Don't Keep Styles Too Long",
-    description:
-      "Protective styles like braids and cornrows should be kept for 4-6 weeks maximum. Leaving them in too long can cause tension, breakage, and buildup on your scalp.",
-  },
-  {
-    icon: Wind,
-    title: "Avoid Excessive Heat",
-    description:
-      "Limit the use of flat irons, blow dryers, and curling wands. When you do use heat, always apply a heat protectant spray first. Air drying is the gentlest option for your hair.",
-  },
-  {
-    icon: Droplets,
-    title: "Wash Day Routine",
-    description:
-      "Use a sulfate-free shampoo and follow up with a deep conditioner. Detangle gently with a wide-tooth comb while your conditioner is in. Rinse with cool water to seal the cuticle.",
-  },
-  {
-    icon: Scissors,
-    title: "Regular Trims",
-    description:
-      "Trim your ends every 8-12 weeks to prevent split ends from travelling up the hair shaft. Even if you're growing your hair out, regular trims keep it healthy and looking fresh.",
-  },
-  {
-    icon: Heart,
-    title: "Be Gentle with Wet Hair",
-    description:
-      "Hair is most fragile when wet. Avoid brushing or pulling wet hair. Instead, use a microfibre towel to gently squeeze out excess water and detangle with a wide-tooth comb.",
-  },
-];
-
-const videos = [
-  { title: "How to Maintain Braids" },
-  { title: "Night Routine for Protective Styles" },
-  { title: "Scalp Care Between Styles" },
-];
+import { Moon, Sun, Sparkles, Wind, AlertTriangle, Clock } from "lucide-react";
+import Link from "next/link";
 
 export default function TipsPage() {
   return (
     <>
       {/* Header */}
-      <section className="bg-brand-cream py-20 lg:py-28">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+      <section className="relative py-20 lg:py-28 overflow-hidden" style={{background:'linear-gradient(135deg, #F5EDE8 0%, #FBF8F6 30%, #EDE4DE 100%)'}}>
+        <div className="absolute inset-0 bg-gradient-to-br from-brand-rose/[0.08] via-transparent to-brand-gold/[0.06]" />
+        <div className="absolute top-10 -left-32 w-80 h-80 rounded-full bg-brand-rose/[0.04] blur-3xl" />
+        <div className="absolute -bottom-20 -right-32 w-80 h-80 rounded-full bg-brand-gold/[0.04] blur-3xl" />
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center relative">
           <p className="section-label mb-4">Hair Education</p>
           <h1 className="section-heading mb-4">
-            Hair Care Tips
+            Maintenance &amp; Care
           </h1>
           <p className="section-subheading max-w-xl mx-auto">
-            Keep your hair healthy, strong, and beautiful between appointments
-            with these expert tips.
+            Everything you need to know about caring for your afro crochet hair
           </p>
         </div>
       </section>
 
-      {/* Tips Grid */}
-      <section className="py-20 lg:py-28 bg-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-brand-cream-dark">
-            {tips.map((tip, i) => (
-              <div
-                key={i}
-                className="bg-white p-8 lg:p-10 group"
-              >
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white border border-brand-gold/30 text-brand-gold mb-6 group-hover:bg-brand-gold group-hover:border-brand-gold group-hover:text-white transition-all duration-300">
-                  <tip.icon className="h-5 w-5" />
-                </div>
-                <h3 className="font-display text-xl font-semibold text-brand-charcoal mb-3">
-                  {tip.title}
+      {/* Disclaimer */}
+      <section className="py-12 border-b border-white/20" style={{background:'linear-gradient(180deg, #F0E8E3 0%, #EDE4DE 100%)'}}>
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          <div className="glass-rose p-6">
+            <div className="flex gap-3">
+              <AlertTriangle className="h-5 w-5 text-brand-rose flex-shrink-0 mt-0.5" />
+              <div>
+                <h3 className="font-display text-base font-semibold text-brand-charcoal mb-2">
+                  Important Disclaimer
                 </h3>
-                <p className="text-sm text-gray-500 leading-relaxed">
-                  {tip.description}
+                <p className="text-sm text-brand-muted leading-relaxed">
+                  This hairstyle requires high maintenance and commitment. If you&apos;re unsure about
+                  dedicating time to care for your hair, we recommend exploring alternative styles to
+                  avoid damage or complications.
                 </p>
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Video Section */}
-      <section className="py-20 lg:py-28">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
-            <p className="section-label mb-4">Watch &amp; Learn</p>
-            <h2 className="font-display text-3xl sm:text-4xl font-semibold text-brand-charcoal">
-              Video Tutorials
+      {/* Maintenance Instructions */}
+      <section className="py-20 lg:py-28 relative" style={{background:'linear-gradient(180deg, #EDE4DE 0%, #F0E8E3 50%, #F5EDE8 100%)'}}>
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <p className="section-label mb-4">Daily Routine</p>
+            <h2 className="section-heading">
+              Maintenance Instructions
             </h2>
-            <p className="section-subheading">
-              Watch and learn how to care for your hair
+            <p className="section-subheading max-w-lg mx-auto">
+              Follow these steps to keep your afro crochet hair looking its best
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {videos.map((video, i) => (
-              <div key={i} className="bg-white border border-brand-cream-dark overflow-hidden">
-                <div className="aspect-video bg-brand-cream flex flex-col items-center justify-center gap-3">
-                  <PlayCircle className="h-14 w-14 text-brand-gold/30" />
-                  <p className="text-xs text-gray-400">Video coming soon</p>
-                </div>
-                <div className="p-5">
-                  <h3 className="font-display text-lg font-semibold text-brand-charcoal">
-                    {video.title}
-                  </h3>
-                </div>
+
+          <div className="space-y-12">
+            {/* Pre-Bedtime Routine */}
+            <div className="grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-6 items-start">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full glass-sm text-brand-rose flex-shrink-0">
+                <Moon className="h-6 w-6" />
               </div>
-            ))}
+              <div>
+                <h3 className="font-display text-xl font-semibold text-brand-charcoal mb-1">
+                  1. Pre-Bedtime Routine
+                </h3>
+                <div className="divider mb-4" />
+                <ul className="space-y-3 text-sm text-brand-muted leading-relaxed">
+                  <li className="flex gap-3">
+                    <span className="text-brand-rose font-bold mt-0.5">&bull;</span>
+                    Spray a mixture of fabric softener and water or leave-in conditioner and water onto the hair.
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="text-brand-rose font-bold mt-0.5">&bull;</span>
+                    Massage the product through the hair gently with your hands.
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="text-brand-rose font-bold mt-0.5">&bull;</span>
+                    Tie your hair into a high or low puff, keeping it simple for easy untie in the morning.
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="text-brand-rose font-bold mt-0.5">&bull;</span>
+                    Wear a scarf, bonnet, or other sleep cover to protect your hair.
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Morning Routine */}
+            <div className="grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-6 items-start">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full glass-sm text-brand-rose flex-shrink-0">
+                <Sun className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="font-display text-xl font-semibold text-brand-charcoal mb-1">
+                  2. Morning Routine
+                </h3>
+                <div className="divider mb-4" />
+                <ul className="space-y-3 text-sm text-brand-muted leading-relaxed">
+                  <li className="flex gap-3">
+                    <span className="text-brand-rose font-bold mt-0.5">&bull;</span>
+                    Optionally, spray the fabric softener mixture or water onto the hair.
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="text-brand-rose font-bold mt-0.5">&bull;</span>
+                    Use mousse to enhance curls and add definition.
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="text-brand-rose font-bold mt-0.5">&bull;</span>
+                    Gently detangle the hair with your hands, avoiding combs or brushes.
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Styling Tips */}
+            <div className="grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-6 items-start">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full glass-sm text-brand-rose flex-shrink-0">
+                <Sparkles className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="font-display text-xl font-semibold text-brand-charcoal mb-1">
+                  3. Styling Tips
+                </h3>
+                <div className="divider mb-4" />
+                <ul className="space-y-3 text-sm text-brand-muted leading-relaxed">
+                  <li className="flex gap-3">
+                    <span className="text-brand-rose font-bold mt-0.5">&bull;</span>
+                    Use a hair dryer on low heat to puff out the hair and add softness.
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="text-brand-rose font-bold mt-0.5">&bull;</span>
+                    Avoid using combs or brushes; instead, use your hands to detangle and style.
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Aftercare CTA */}
-      <section className="py-24 lg:py-32 bg-brand-purple">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-xs font-medium uppercase tracking-editorial text-brand-gold-light mb-6">
-            Personalised Care
+      {/* Important Care Notes */}
+      <section className="py-20 lg:py-28 relative" style={{background:'linear-gradient(180deg, #F5EDE8 0%, #EDE4DE 50%, #F0E8E3 100%)'}}>
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <p className="section-label mb-4">Good to Know</p>
+            <h2 className="font-display text-3xl sm:text-4xl font-semibold text-brand-charcoal">
+              Important Care Notes
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="glass p-6 text-center">
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-rose/10">
+                <Wind className="h-5 w-5 text-brand-rose" />
+              </div>
+              <h3 className="font-display text-lg font-semibold text-brand-charcoal mb-2">
+                Avoid Water Submersion
+              </h3>
+              <p className="text-sm text-brand-muted leading-relaxed">
+                Avoid submerging your head in water, such as swimming, as it can damage the synthetic fibre.
+              </p>
+            </div>
+            <div className="glass p-6 text-center">
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-rose/10">
+                <Sparkles className="h-5 w-5 text-brand-rose" />
+              </div>
+              <h3 className="font-display text-lg font-semibold text-brand-charcoal mb-2">
+                Handle with Care
+              </h3>
+              <p className="text-sm text-brand-muted leading-relaxed">
+                Be gentle when handling the hair to prevent tangling or breakage.
+              </p>
+            </div>
+            <div className="glass p-6 text-center">
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-rose/10">
+                <Clock className="h-5 w-5 text-brand-rose" />
+              </div>
+              <h3 className="font-display text-lg font-semibold text-brand-charcoal mb-2">
+                Longevity
+              </h3>
+              <p className="text-sm text-brand-muted leading-relaxed">
+                With proper care, your afro crochet hair can last 2–3 weeks, potentially up to a month.
+              </p>
+            </div>
+          </div>
+
+          <p className="text-sm text-brand-muted text-center mt-10 max-w-lg mx-auto leading-relaxed">
+            By following these instructions, you&apos;ll be able to enjoy your afro crochet hair while
+            maintaining its quality and longevity. If you have any questions or concerns, please
+            don&apos;t hesitate to contact us.
           </p>
-          <h2 className="font-display text-3xl sm:text-4xl font-semibold text-white leading-[1.1] mb-4">
-            Need Personalised Advice?
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="relative py-24 lg:py-32 overflow-hidden" style={{background:'linear-gradient(135deg, #EDE4DE 0%, #F5EDE8 40%, #F0E8E3 100%)'}}>
+        <div className="absolute inset-0 bg-gradient-to-br from-brand-rose/[0.06] via-transparent to-brand-gold/[0.05]" />
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center relative">
+          <p className="text-xs font-medium uppercase tracking-editorial text-brand-rose mb-6">
+            Ready?
+          </p>
+          <h2 className="font-display text-3xl sm:text-4xl font-semibold text-brand-charcoal leading-[1.1] mb-4">
+            Book Your Appointment
           </h2>
-          <p className="text-white/60 max-w-md mx-auto mb-10 leading-relaxed">
-            Book a consultation and we&apos;ll create a custom hair care plan
-            just for you.
+          <p className="text-brand-muted max-w-md mx-auto mb-10 leading-relaxed">
+            Now that you know how to care for your hair, book your next appointment with us.
           </p>
-          <a href="/booking" className="btn-gold px-10 py-4">
-            Book a Consultation
-          </a>
+          <Link href="/booking" className="btn-gold px-10 py-4">
+            Book Now
+          </Link>
         </div>
       </section>
     </>

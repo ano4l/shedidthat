@@ -23,7 +23,7 @@ export default function BookingPage() {
     <Suspense
       fallback={
         <div className="flex items-center justify-center min-h-[60vh]">
-          <Loader2 className="h-6 w-6 animate-spin text-brand-purple" />
+          <Loader2 className="h-6 w-6 animate-spin text-brand-rose" />
         </div>
       }
     >
@@ -32,7 +32,7 @@ export default function BookingPage() {
   );
 }
 
-type Step = "service" | "hair" | "datetime" | "details" | "payment" | "upload" | "done";
+type Step = "service" | "hair" | "datetime" | "details" | "policy" | "payment" | "upload" | "done";
 
 interface BookingState {
   service: Service | null;
@@ -42,6 +42,7 @@ interface BookingState {
   name: string;
   email: string;
   phone: string;
+  juicePreference: string;
   paymentChoice: PaymentChoice;
 }
 
@@ -74,6 +75,7 @@ function BookingContent() {
     name: "",
     email: "",
     phone: "",
+    juicePreference: "",
     paymentChoice: "DEPOSIT",
   });
 
@@ -193,6 +195,7 @@ function BookingContent() {
           end_time: booking.timeSlot.end.toISOString(),
           payment_choice: booking.paymentChoice,
           amount_due: amountDue,
+          juice_preference: booking.juicePreference || null,
         }),
       });
       const data = await res.json();
@@ -243,12 +246,12 @@ function BookingContent() {
   const calendarDates = Array.from({ length: 30 }, (_, i) => addDays(startOfDay(new Date()), i + 1))
     .filter((d) => !BUSINESS_HOURS.daysOff.includes(d.getDay()));
 
-  const stepIndex = ["service", "hair", "datetime", "details", "payment", "upload", "done"].indexOf(step);
+  const stepIndex = ["service", "hair", "datetime", "details", "policy", "payment", "upload", "done"].indexOf(step);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="h-6 w-6 animate-spin text-brand-purple" />
+        <Loader2 className="h-6 w-6 animate-spin text-brand-rose" />
       </div>
     );
   }
@@ -256,8 +259,11 @@ function BookingContent() {
   return (
     <>
       {/* Page Header */}
-      <section className="bg-brand-cream py-12 lg:py-16 border-b border-brand-cream-dark">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
+      <section className="relative py-12 lg:py-16 border-b border-white/20 overflow-hidden" style={{background:'linear-gradient(135deg, #F5EDE8 0%, #FBF8F6 30%, #EDE4DE 100%)'}}>
+        <div className="absolute inset-0 bg-gradient-to-br from-brand-rose/[0.08] via-transparent to-brand-gold/[0.06]" />
+        <div className="absolute top-5 -right-24 w-64 h-64 rounded-full bg-brand-rose/[0.04] blur-3xl" />
+        <div className="absolute -bottom-16 -left-24 w-64 h-64 rounded-full bg-brand-gold/[0.04] blur-3xl" />
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center relative">
           <p className="section-label mb-3">Book Now</p>
           <h1 className="font-display text-3xl sm:text-4xl font-semibold text-brand-charcoal">
             Schedule Your Appointment
@@ -265,12 +271,12 @@ function BookingContent() {
         </div>
       </section>
 
-      <section className="py-12 sm:py-16 bg-white">
+      <section className="py-12 sm:py-16 relative" style={{background:'linear-gradient(180deg, #F0E8E3 0%, #EDE4DE 50%, #F5EDE8 100%)'}}>
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
           {/* Progress */}
           <div className="mb-12">
             <div className="flex items-center justify-between text-xs mb-3">
-              {["Service", "Hair", "Date & Time", "Details", "Payment", "Upload", "Done"].map(
+              {["Service", "Hair", "Date & Time", "Details", "Policy", "Payment", "Upload", "Done"].map(
                 (label, i) => {
                   const isActive = stepIndex >= i;
                   const isCurrent = stepIndex === i;
@@ -280,10 +286,10 @@ function BookingContent() {
                       className={cn(
                         "hidden sm:block transition-colors",
                         isCurrent
-                          ? "text-brand-purple font-semibold"
+                          ? "text-brand-rose font-semibold"
                           : isActive
-                          ? "text-brand-purple/60"
-                          : "text-gray-300"
+                          ? "text-brand-rose/60"
+                          : "text-brand-muted/30"
                       )}
                     >
                       {label}
@@ -292,10 +298,10 @@ function BookingContent() {
                 }
               )}
             </div>
-            <div className="h-0.5 bg-gray-100 overflow-hidden">
+            <div className="h-0.5 bg-brand-charcoal/[0.06] overflow-hidden rounded-full">
               <div
-                className="h-full bg-brand-purple transition-all duration-500"
-                style={{ width: `${((stepIndex + 1) / 7) * 100}%` }}
+                className="h-full bg-gradient-to-r from-brand-rose to-brand-gold transition-all duration-500"
+                style={{ width: `${((stepIndex + 1) / 8) * 100}%` }}
               />
             </div>
           </div>
@@ -306,7 +312,7 @@ function BookingContent() {
               <h2 className="font-display text-2xl font-semibold text-brand-charcoal mb-2">
                 Choose a Service
               </h2>
-              <p className="text-sm text-gray-500 mb-8">
+              <p className="text-sm text-brand-muted mb-8">
                 Select the service you&apos;d like to book
               </p>
               <div className="space-y-3">
@@ -317,21 +323,21 @@ function BookingContent() {
                     className={cn(
                       "w-full text-left p-5 border transition-all duration-200 cursor-pointer flex items-center justify-between group",
                       booking.service?.id === s.id
-                        ? "border-brand-purple bg-brand-purple/[0.03]"
-                        : "border-gray-200 hover:border-brand-purple/40"
+                        ? "border-brand-rose bg-brand-rose/[0.06]"
+                        : "border-brand-charcoal/[0.08] hover:border-brand-rose/30"
                     )}
                   >
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-display text-lg font-semibold text-brand-charcoal group-hover:text-brand-purple transition-colors">
+                      <h3 className="font-display text-lg font-semibold text-brand-charcoal group-hover:text-brand-rose transition-colors">
                         {s.name}
                       </h3>
-                      <p className="text-sm text-gray-400 mt-1 line-clamp-1">{s.description}</p>
-                      <span className="flex items-center gap-1.5 mt-2 text-xs text-gray-400">
+                      <p className="text-sm text-brand-muted mt-1 line-clamp-1">{s.description}</p>
+                      <span className="flex items-center gap-1.5 mt-2 text-xs text-brand-muted/60">
                         <Clock className="h-3 w-3" />
                         {s.duration_minutes} min
                       </span>
                     </div>
-                    <span className="font-display text-xl font-semibold text-brand-gold whitespace-nowrap ml-6">
+                    <span className="font-display text-xl font-semibold text-brand-rose whitespace-nowrap ml-6">
                       {formatCurrency(s.full_price)}
                     </span>
                   </button>
@@ -345,14 +351,14 @@ function BookingContent() {
             <div>
               <button
                 onClick={() => setStep("service")}
-                className="flex items-center gap-1 text-sm text-gray-400 hover:text-brand-purple mb-8 transition-colors"
+                className="flex items-center gap-1 text-sm text-brand-muted hover:text-brand-rose mb-8 transition-colors"
               >
                 <ChevronLeft className="h-4 w-4" /> Back
               </button>
               <h2 className="font-display text-2xl font-semibold text-brand-charcoal mb-2">
                 Hair Option
               </h2>
-              <p className="text-sm text-gray-500 mb-8">Choose your preferred hair option</p>
+              <p className="text-sm text-brand-muted mb-8">Choose your preferred hair option</p>
               <div className="space-y-3">
                 {hairOptions.map((opt) => (
                   <button
@@ -361,12 +367,12 @@ function BookingContent() {
                     className={cn(
                       "w-full text-left p-5 border transition-all duration-200 cursor-pointer flex items-center justify-between",
                       booking.hairOption?.id === opt.id
-                        ? "border-brand-purple bg-brand-purple/[0.03]"
-                        : "border-gray-200 hover:border-brand-purple/40"
+                        ? "border-brand-rose bg-brand-rose/[0.06]"
+                        : "border-brand-charcoal/[0.08] hover:border-brand-rose/30"
                     )}
                   >
-                    <span className="font-medium text-brand-charcoal">{opt.name}</span>
-                    <span className="text-sm font-semibold text-brand-gold">
+                    <span className="font-medium text-brand-charcoal/90">{opt.name}</span>
+                    <span className="text-sm font-semibold text-brand-rose">
                       {opt.price_delta > 0
                         ? `+${formatCurrency(opt.price_delta)}`
                         : opt.price_delta === 0
@@ -386,14 +392,14 @@ function BookingContent() {
                 onClick={() =>
                   setStep(booking.service?.has_hair_options ? "hair" : "service")
                 }
-                className="flex items-center gap-1 text-sm text-gray-400 hover:text-brand-purple mb-8 transition-colors"
+                className="flex items-center gap-1 text-sm text-brand-muted hover:text-brand-rose mb-8 transition-colors"
               >
                 <ChevronLeft className="h-4 w-4" /> Back
               </button>
               <h2 className="font-display text-2xl font-semibold text-brand-charcoal mb-2">
                 Pick a Date &amp; Time
               </h2>
-              <p className="text-sm text-gray-500 mb-8">
+              <p className="text-sm text-brand-muted mb-8">
                 {booking.service?.name} — {booking.service?.duration_minutes} minutes
               </p>
 
@@ -414,8 +420,8 @@ function BookingContent() {
                         className={cn(
                           "flex-shrink-0 flex flex-col items-center border px-4 py-3 text-sm transition-all duration-200",
                           isSelected
-                            ? "border-brand-purple bg-brand-purple text-white"
-                            : "border-gray-200 hover:border-brand-purple/40"
+                            ? "border-brand-rose bg-brand-rose text-white"
+                            : "border-brand-charcoal/[0.08] hover:border-brand-rose/30"
                         )}
                       >
                         <span className="text-xs font-medium">{format(d, "EEE")}</span>
@@ -433,10 +439,10 @@ function BookingContent() {
                   <h3 className="label mb-4">Available Times</h3>
                   {slotsLoading ? (
                     <div className="flex items-center justify-center py-8">
-                      <Loader2 className="h-5 w-5 animate-spin text-brand-purple" />
+                      <Loader2 className="h-5 w-5 animate-spin text-brand-rose" />
                     </div>
                   ) : slots.length === 0 ? (
-                    <p className="text-sm text-gray-400 py-4">
+                    <p className="text-sm text-brand-muted/60 py-4">
                       No available slots for this date. Try another day.
                     </p>
                   ) : (
@@ -453,8 +459,8 @@ function BookingContent() {
                             className={cn(
                               "border px-3 py-2.5 text-sm font-medium transition-all duration-200",
                               isSelected
-                                ? "border-brand-purple bg-brand-purple text-white"
-                                : "border-gray-200 hover:border-brand-purple/40"
+                                ? "border-brand-rose bg-brand-rose text-white"
+                                : "border-brand-charcoal/[0.08] hover:border-brand-rose/30"
                             )}
                           >
                             {slot.label}
@@ -482,14 +488,14 @@ function BookingContent() {
             <div>
               <button
                 onClick={() => setStep("datetime")}
-                className="flex items-center gap-1 text-sm text-gray-400 hover:text-brand-purple mb-8 transition-colors"
+                className="flex items-center gap-1 text-sm text-brand-muted hover:text-brand-rose mb-8 transition-colors"
               >
                 <ChevronLeft className="h-4 w-4" /> Back
               </button>
               <h2 className="font-display text-2xl font-semibold text-brand-charcoal mb-2">
                 Your Details
               </h2>
-              <p className="text-sm text-gray-500 mb-8">Tell us who you are</p>
+              <p className="text-sm text-brand-muted mb-8">Tell us who you are</p>
 
               <div className="space-y-5">
                 <div>
@@ -529,6 +535,29 @@ function BookingContent() {
                   />
                 </div>
 
+                <div>
+                  <label className="label">Preferred Juice <span className="text-brand-muted/50 font-normal">(water is standard)</span></label>
+                  <div className="grid grid-cols-3 gap-3 mt-1">
+                    {["Litchi", "Cranberry", "Apple"].map((juice) => (
+                      <button
+                        key={juice}
+                        onClick={() =>
+                          setBooking((prev) => ({ ...prev, juicePreference: juice }))
+                        }
+                        className={cn(
+                          "p-3 border text-center cursor-pointer transition-all duration-200 text-sm",
+                          booking.juicePreference === juice
+                            ? "border-brand-rose bg-brand-rose/[0.06] text-brand-rose-light font-medium"
+                            : "border-brand-charcoal/[0.08] hover:border-brand-rose/30 text-brand-muted"
+                        )}
+                      >
+                        {juice}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-brand-muted/50 mt-2">Water is standard and always available</p>
+                </div>
+
                 {/* Payment Choice */}
                 <div>
                   <label className="label">Payment Option</label>
@@ -540,12 +569,12 @@ function BookingContent() {
                       className={cn(
                         "p-5 border text-center cursor-pointer transition-all duration-200",
                         booking.paymentChoice === "DEPOSIT"
-                          ? "border-brand-purple bg-brand-purple/[0.03]"
-                          : "border-gray-200 hover:border-brand-purple/40"
+                          ? "border-brand-rose bg-brand-rose/[0.06]"
+                          : "border-brand-charcoal/[0.08] hover:border-brand-rose/30"
                       )}
                     >
                       <p className="font-medium text-brand-charcoal text-sm">Pay Deposit</p>
-                      <p className="font-display text-xl font-semibold text-brand-gold mt-1">
+                      <p className="font-display text-xl font-semibold text-brand-rose mt-1">
                         {formatCurrency(
                           calculateAmountDue(
                             booking.service!.full_price,
@@ -564,12 +593,12 @@ function BookingContent() {
                       className={cn(
                         "p-5 border text-center cursor-pointer transition-all duration-200",
                         booking.paymentChoice === "FULL"
-                          ? "border-brand-purple bg-brand-purple/[0.03]"
-                          : "border-gray-200 hover:border-brand-purple/40"
+                          ? "border-brand-rose bg-brand-rose/[0.06]"
+                          : "border-brand-charcoal/[0.08] hover:border-brand-rose/30"
                       )}
                     >
                       <p className="font-medium text-brand-charcoal text-sm">Pay Full</p>
-                      <p className="font-display text-xl font-semibold text-brand-gold mt-1">
+                      <p className="font-display text-xl font-semibold text-brand-rose mt-1">
                         {formatCurrency(totalPrice)}
                       </p>
                     </button>
@@ -578,14 +607,139 @@ function BookingContent() {
               </div>
 
               <button
-                onClick={handleSubmitBooking}
-                disabled={!booking.name || !booking.email || !booking.phone || submitting}
+                onClick={() => setStep("policy")}
+                disabled={!booking.name || !booking.email || !booking.phone}
                 className="btn-primary w-full mt-10"
+              >
+                Continue <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+          )}
+
+          {/* Step: Booking Policy */}
+          {step === "policy" && (
+            <div>
+              <button
+                onClick={() => setStep("details")}
+                className="flex items-center gap-1 text-sm text-brand-muted hover:text-brand-rose mb-8 transition-colors"
+              >
+                <ChevronLeft className="h-4 w-4" /> Back
+              </button>
+              <h2 className="font-display text-2xl font-semibold text-brand-charcoal mb-2">
+                Booking Policy
+              </h2>
+              <p className="text-sm text-brand-muted mb-8">
+                Please review our policy before confirming your booking
+              </p>
+
+              <div className="space-y-6">
+                {/* Pre-Booking Requirements */}
+                <div className="glass p-5">
+                  <h3 className="font-display text-base font-semibold text-brand-charcoal mb-3">
+                    Pre-Booking Requirements
+                  </h3>
+                  <ul className="space-y-2 text-sm text-brand-muted">
+                    <li className="flex gap-2">
+                      <span className="text-brand-rose mt-0.5">&bull;</span>
+                      Please arrive with clean, washed hair. We do not provide hair washing services.
+                    </li>
+                    <li className="flex gap-2">
+                      <span className="text-brand-rose mt-0.5">&bull;</span>
+                      If you have short hair, please contact us and send a picture of your hair before booking to confirm suitability.
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Booking Terms */}
+                <div className="glass p-5">
+                  <h3 className="font-display text-base font-semibold text-brand-charcoal mb-3">
+                    Booking Terms
+                  </h3>
+                  <ul className="space-y-2 text-sm text-brand-muted">
+                    <li className="flex gap-2">
+                      <span className="text-brand-rose mt-0.5">&bull;</span>
+                      A non-refundable booking fee of R100 is required to secure your appointment, separate from the down payment.
+                    </li>
+                    <li className="flex gap-2">
+                      <span className="text-brand-rose mt-0.5">&bull;</span>
+                      Refunds will not be issued for cancellations or changes made within 24 hours of the scheduled appointment.
+                    </li>
+                    <li className="flex gap-2">
+                      <span className="text-brand-rose mt-0.5">&bull;</span>
+                      Due to limited sitting area, only one visitor is allowed per appointment.
+                    </li>
+                    <li className="flex gap-2">
+                      <span className="text-brand-rose mt-0.5">&bull;</span>
+                      An after-hours fee of R100 applies to appointments requested after 17:00.
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Important Notes */}
+                <div className="glass p-5">
+                  <h3 className="font-display text-base font-semibold text-brand-charcoal mb-3">
+                    Important Notes
+                  </h3>
+                  <ul className="space-y-2 text-sm text-brand-muted">
+                    <li className="flex gap-2">
+                      <span className="text-brand-rose mt-0.5">&bull;</span>
+                      The afro fibre used is synthetic and cannot be reused.
+                    </li>
+                    <li className="flex gap-2">
+                      <span className="text-brand-rose mt-0.5">&bull;</span>
+                      Cornrows done prior to installation are for stability and a smooth install, not for aesthetics.
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Amendments and Cancellations */}
+                <div className="glass p-5">
+                  <h3 className="font-display text-base font-semibold text-brand-charcoal mb-3">
+                    Amendments &amp; Cancellations
+                  </h3>
+                  <ul className="space-y-2 text-sm text-brand-muted">
+                    <li className="flex gap-2">
+                      <span className="text-brand-rose mt-0.5">&bull;</span>
+                      Please notify us at least 24 hours in advance of any changes or cancellations.
+                    </li>
+                    <li className="flex gap-2">
+                      <span className="text-brand-rose mt-0.5">&bull;</span>
+                      Changes or cancellations made within 24 hours of the appointment will incur a fee, as per our refund policy.
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Late Arrival Policy */}
+                <div className="glass p-5">
+                  <h3 className="font-display text-base font-semibold text-brand-charcoal mb-3">
+                    Late Arrival Policy
+                  </h3>
+                  <ul className="space-y-2 text-sm text-brand-muted">
+                    <li className="flex gap-2">
+                      <span className="text-brand-rose mt-0.5">&bull;</span>
+                      A late fee of R100 applies if you arrive 30-45 minutes late for your appointment.
+                    </li>
+                    <li className="flex gap-2">
+                      <span className="text-brand-rose mt-0.5">&bull;</span>
+                      If you arrive more than 1 hour late, you will forfeit your booking fee, and your appointment will be automatically cancelled.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <p className="text-xs text-brand-muted/60 text-center mt-6 mb-4">
+                By confirming your booking, you acknowledge that you have read and understand our booking policy. If you have any questions or concerns, please don&apos;t hesitate to contact us.
+              </p>
+
+              <button
+                onClick={handleSubmitBooking}
+                disabled={submitting}
+                className="btn-primary w-full mt-4"
               >
                 {submitting ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  "Confirm & Get Payment Details"
+                  "I Agree — Confirm & Get Payment Details"
                 )}
               </button>
             </div>
@@ -595,58 +749,58 @@ function BookingContent() {
           {step === "payment" && bookingResult && (
             <div>
               <div className="text-center mb-10">
-                <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-brand-gold/10">
-                  <Banknote className="h-7 w-7 text-brand-gold" />
+                <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-brand-rose/10">
+                  <Banknote className="h-7 w-7 text-brand-rose" />
                 </div>
                 <h2 className="font-display text-2xl font-semibold text-brand-charcoal">
                   Payment Instructions
                 </h2>
-                <p className="text-sm text-gray-500 mt-2">
+                <p className="text-sm text-brand-muted mt-2">
                   Please make an EFT payment using the details below
                 </p>
               </div>
 
-              <div className="bg-gray-50 border border-gray-200 p-6 mb-6">
-                <h3 className="text-xs font-medium uppercase tracking-editorial text-brand-gold mb-5">
+              <div className="glass p-6 mb-6">
+                <h3 className="text-xs font-medium uppercase tracking-editorial text-brand-rose mb-5">
                   Banking Details
                 </h3>
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Bank</span>
+                    <span className="text-brand-muted">Bank</span>
                     <span className="font-medium text-brand-charcoal">{BANKING_DETAILS.bankName}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Account Name</span>
+                    <span className="text-brand-muted">Account Name</span>
                     <span className="font-medium text-brand-charcoal">{BANKING_DETAILS.accountName}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Account Number</span>
+                    <span className="text-brand-muted">Account Number</span>
                     <span className="font-medium text-brand-charcoal">{BANKING_DETAILS.accountNumber}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Branch Code</span>
+                    <span className="text-brand-muted">Branch Code</span>
                     <span className="font-medium text-brand-charcoal">{BANKING_DETAILS.branchCode}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Account Type</span>
+                    <span className="text-brand-muted">Account Type</span>
                     <span className="font-medium text-brand-charcoal">{BANKING_DETAILS.accountType}</span>
                   </div>
                 </div>
               </div>
 
-              <div className="border border-brand-cream-dark p-6 mb-6">
+              <div className="glass p-6 mb-6">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-medium uppercase tracking-editorial text-gray-400">Amount Due</span>
-                  <span className="font-display text-2xl font-semibold text-brand-gold">
+                  <span className="text-xs font-medium uppercase tracking-editorial text-brand-muted/60">Amount Due</span>
+                  <span className="font-display text-2xl font-semibold text-brand-rose">
                     {formatCurrency(bookingResult.amountDue)}
                   </span>
                 </div>
-                <div className="h-px bg-brand-cream-dark my-3" />
+                <div className="h-px bg-brand-charcoal/[0.06] my-3" />
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium uppercase tracking-editorial text-gray-400">Reference</span>
+                  <span className="text-xs font-medium uppercase tracking-editorial text-brand-muted/60">Reference</span>
                   <button
                     onClick={copyRef}
-                    className="flex items-center gap-2 text-sm font-mono font-bold text-brand-gold hover:text-brand-gold-dark transition-colors"
+                    className="flex items-center gap-2 text-sm font-mono font-bold text-brand-rose hover:text-brand-rose-light transition-colors"
                   >
                     {bookingResult.reference}
                     <Copy className="h-3.5 w-3.5" />
@@ -657,7 +811,7 @@ function BookingContent() {
                 </div>
               </div>
 
-              <p className="text-sm text-gray-400 text-center mb-8">
+              <p className="text-sm text-brand-muted/60 text-center mb-8">
                 After making payment, upload your Proof of Payment below.
               </p>
 
@@ -672,27 +826,27 @@ function BookingContent() {
             <div>
               <button
                 onClick={() => setStep("payment")}
-                className="flex items-center gap-1 text-sm text-gray-400 hover:text-brand-purple mb-8 transition-colors"
+                className="flex items-center gap-1 text-sm text-brand-muted hover:text-brand-rose mb-8 transition-colors"
               >
                 <ChevronLeft className="h-4 w-4" /> Back to Payment Details
               </button>
               <div className="text-center mb-10">
-                <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-brand-purple/10">
-                  <Upload className="h-7 w-7 text-brand-purple" />
+                <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-brand-rose/10">
+                  <Upload className="h-7 w-7 text-brand-rose" />
                 </div>
                 <h2 className="font-display text-2xl font-semibold text-brand-charcoal">
                   Upload Proof of Payment
                 </h2>
-                <p className="text-sm text-gray-500 mt-2">
+                <p className="text-sm text-brand-muted mt-2">
                   Accepted: PDF, JPG, PNG (max 10MB)
                 </p>
               </div>
 
-              <div className="border border-brand-cream-dark p-6">
+              <div className="glass p-6">
                 <label className="block">
-                  <div className="flex flex-col items-center justify-center border border-dashed border-gray-300 p-10 hover:border-brand-purple transition-colors duration-200 cursor-pointer">
-                    <Upload className="h-8 w-8 text-gray-300 mb-3" />
-                    <p className="text-sm text-gray-500">
+                  <div className="flex flex-col items-center justify-center border border-dashed border-brand-charcoal/15 rounded-xl p-10 hover:border-brand-rose/40 transition-colors duration-200 cursor-pointer">
+                    <Upload className="h-8 w-8 text-brand-muted/30 mb-3" />
+                    <p className="text-sm text-brand-muted">
                       {uploadFile ? uploadFile.name : "Click to select file"}
                     </p>
                   </div>
@@ -722,19 +876,19 @@ function BookingContent() {
           {/* Step: Done */}
           {step === "done" && (
             <div className="text-center py-16">
-              <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-50">
+              <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-500/10">
                 <CheckCircle className="h-10 w-10 text-green-500" />
               </div>
               <h2 className="font-display text-3xl font-semibold text-brand-charcoal mb-4">
                 Thank You!
               </h2>
-              <p className="text-gray-500 max-w-md mx-auto mb-3 leading-relaxed">
+              <p className="text-brand-muted max-w-md mx-auto mb-3 leading-relaxed">
                 Your proof of payment has been submitted. We&apos;ll review it and
                 send you a confirmation email once your booking is approved.
               </p>
               {bookingResult && (
-                <p className="text-sm text-gray-400 mb-10">
-                  Reference: <strong className="text-brand-purple">{bookingResult.reference}</strong>
+                <p className="text-sm text-brand-muted/60 mb-10">
+                  Reference: <strong className="text-brand-rose">{bookingResult.reference}</strong>
                 </p>
               )}
               <button onClick={() => router.push("/")} className="btn-secondary">

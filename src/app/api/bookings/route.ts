@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const {
       customer_name, email, phone, service_id, hair_option_id,
-      start_time, end_time, payment_choice, amount_due,
+      start_time, end_time, payment_choice, amount_due, juice_preference,
     } = body;
 
     if (!customer_name || !email || !phone || !service_id || !start_time || !end_time) {
@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
         customer_name, email, phone, service_id,
         hair_option_id: hair_option_id || null,
         start_time, end_time, payment_choice, amount_due,
+        juice_preference: juice_preference || null,
         status: "REQUESTED",
       })
       .select()

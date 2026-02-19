@@ -161,3 +161,13 @@ SELECT id, 'Not Sure / Consult Me', 0 FROM services WHERE has_hair_options = tru
 -- Run this separately or via Supabase dashboard:
 -- Create a public bucket called "payment-proofs"
 -- INSERT INTO storage.buckets (id, name, public) VALUES ('payment-proofs', 'payment-proofs', true);
+
+-- ============================================
+-- JUICE PREFERENCE (Add this to existing schema)
+-- ============================================
+-- Run this in Supabase SQL Editor to add juice preference to existing bookings:
+ALTER TABLE booking_requests ADD COLUMN IF NOT EXISTS juice_preference TEXT;
+
+-- Update the Insert type in Database interface to include juice_preference
+-- This allows the API to save juice preferences
+

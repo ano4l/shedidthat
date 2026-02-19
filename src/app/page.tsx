@@ -94,23 +94,27 @@ export default function HomePage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative bg-brand-cream overflow-hidden">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="relative overflow-hidden" style={{background:'linear-gradient(135deg, #F5EDE8 0%, #FBF8F6 30%, #F0E8E3 60%, #F5EDE8 100%)'}}>
+        <div className="absolute inset-0 bg-gradient-to-br from-brand-rose/[0.08] via-transparent to-brand-gold/[0.06]" />
+        <div className="absolute top-20 -left-40 w-96 h-96 rounded-full bg-brand-rose/[0.05] blur-3xl" style={{animation: 'orb-drift 20s ease-in-out infinite'}} />
+        <div className="absolute bottom-20 -right-40 w-96 h-96 rounded-full bg-brand-gold/[0.05] blur-3xl" style={{animation: 'orb-drift 25s ease-in-out infinite reverse'}} />
+        <div className="absolute top-1/2 left-1/3 w-64 h-64 rounded-full bg-blue-200/[0.03] blur-3xl" style={{animation: 'orb-drift 18s ease-in-out infinite 3s'}} />
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 min-h-[85vh] items-center">
             {/* Left — Copy */}
             <div className="py-20 lg:py-32 lg:pr-16">
               <p className="section-label mb-6">Premium Hair Studio</p>
               <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-semibold text-brand-charcoal leading-[1.05]">
                 Beautiful Braids,{" "}
-                <span className="text-brand-gold">Crafted</span> With Care
+                <span className="rose-gradient-text">Crafted</span> With Care
               </h1>
-              <p className="mt-8 text-base text-gray-500 max-w-lg leading-relaxed">
+              <p className="mt-8 text-base text-brand-muted max-w-lg leading-relaxed">
                 From knotless box braids to sleek cornrows, She Did That is your
                 go-to studio for protective styles that look amazing and last.
                 Book online in minutes and walk out feeling like a queen.
               </p>
               <div className="mt-10 flex flex-wrap gap-4">
-                <Link href="/booking" className="btn-primary px-8 py-4">
+                <Link href="/booking" className="btn-gold px-8 py-4">
                   Book Appointment
                 </Link>
                 <Link href="/services" className="btn-secondary px-8 py-4">
@@ -122,9 +126,9 @@ export default function HomePage() {
                   {[...Array(4)].map((_, i) => (
                     <div
                       key={i}
-                      className="h-10 w-10 rounded-full bg-brand-purple/10 border-2 border-brand-cream flex items-center justify-center"
+                      className="h-10 w-10 rounded-full bg-white/60 backdrop-blur-xl border-2 border-white shadow-glass-inner flex items-center justify-center"
                     >
-                      <span className="text-xs font-medium text-brand-purple">
+                      <span className="text-xs font-medium text-brand-rose">
                         {["T", "N", "A", "Z"][i]}
                       </span>
                     </div>
@@ -133,23 +137,24 @@ export default function HomePage() {
                 <div>
                   <div className="flex items-center gap-1">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-3.5 w-3.5 fill-brand-gold text-brand-gold" />
+                      <Star key={i} className="h-3.5 w-3.5 fill-brand-rose text-brand-rose" />
                     ))}
                   </div>
-                  <p className="text-xs text-gray-400 mt-0.5">Loved by 500+ clients</p>
+                  <p className="text-xs text-brand-muted/60 mt-0.5">Loved by 500+ clients</p>
                 </div>
               </div>
             </div>
 
             {/* Right — Hero Image */}
             <div className="relative hidden lg:block">
-              <div className="absolute inset-0 bg-brand-purple/5 rounded-tl-[80px]" />
+              <div className="absolute inset-0 bg-brand-rose/[0.03] rounded-tl-[80px]" />
               <div className="relative h-full min-h-[600px] rounded-tl-[80px] overflow-hidden">
                 <img
                   src="/images/hero.jpg"
                   alt="Beautiful braided hairstyle"
                   className="w-full h-full object-cover"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-white/30 to-transparent" />
               </div>
             </div>
           </div>
@@ -157,15 +162,16 @@ export default function HomePage() {
       </section>
 
       {/* Stats Bar */}
-      <section className="bg-brand-charcoal text-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 lg:py-14">
+      <section className="relative border-y border-white/20 overflow-hidden" style={{background:'linear-gradient(90deg, rgba(183,110,121,0.08) 0%, rgba(251,248,246,0.6) 50%, rgba(194,149,107,0.08) 100%)',backdropFilter:'blur(40px) saturate(180%)'}}>
+        <div className="absolute inset-0 bg-gradient-to-r from-brand-rose/[0.06] via-transparent to-brand-gold/[0.06]" />
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 lg:py-14 relative">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-16">
             {stats.map((stat, i) => (
-              <div key={i} className="text-center">
-                <p className="font-display text-3xl sm:text-4xl font-semibold text-brand-gold">
+              <div key={i} className="text-center glass-sm p-6">
+                <p className="font-display text-3xl sm:text-4xl font-semibold rose-gradient-text">
                   {stat.value}
                 </p>
-                <p className="text-sm text-white/60 mt-1">{stat.label}</p>
+                <p className="text-sm text-brand-muted mt-1">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -173,8 +179,9 @@ export default function HomePage() {
       </section>
 
       {/* Services Preview */}
-      <section className="py-24 lg:py-32 bg-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="py-24 lg:py-32 relative" style={{background:'linear-gradient(180deg, #F0E8E3 0%, #EDE4DE 50%, #F5EDE8 100%)'}}>
+        <div className="absolute inset-0 bg-gradient-to-br from-brand-rose/[0.05] via-transparent to-brand-gold/[0.04]" />
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center mb-16">
             <p className="section-label mb-4">Our Services</p>
             <h2 className="section-heading">
@@ -186,8 +193,8 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {services.map((svc, i) => (
-              <div key={i} className="border border-gray-200 p-6 lg:p-8 group hover:border-brand-gold/40 transition-all duration-300">
-                <div className="aspect-square mb-6 overflow-hidden bg-gray-100">
+              <div key={i} className="glass p-6 lg:p-8 group hover:shadow-glass-rose hover:-translate-y-1 transition-all duration-500">
+                <div className="aspect-square mb-6 overflow-hidden rounded-xl bg-brand-cream">
                   <img
                     src={svc.image}
                     alt={svc.name}
@@ -195,24 +202,24 @@ export default function HomePage() {
                   />
                 </div>
                 <div className="flex items-start justify-between mb-4">
-                  <h3 className="font-display text-xl font-semibold text-brand-charcoal group-hover:text-brand-purple transition-colors">
+                  <h3 className="font-display text-xl font-semibold text-brand-charcoal group-hover:text-brand-rose transition-colors">
                     {svc.name}
                   </h3>
-                  <span className="font-display text-xl font-semibold text-brand-gold whitespace-nowrap ml-4">
+                  <span className="font-display text-xl font-semibold text-brand-rose whitespace-nowrap ml-4">
                     {svc.price}
                   </span>
                 </div>
-                <p className="text-sm text-gray-500 mb-6 leading-relaxed">
+                <p className="text-sm text-brand-muted mb-6 leading-relaxed">
                   {svc.description}
                 </p>
                 <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-1.5 text-xs text-gray-400">
+                  <span className="flex items-center gap-1.5 text-xs text-brand-muted/60">
                     <Clock className="h-3.5 w-3.5" />
                     {svc.duration}
                   </span>
                   <Link
                     href={svc.href}
-                    className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-purple hover:text-brand-purple-dark transition-colors"
+                    className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-rose hover:text-brand-rose-light transition-colors"
                   >
                     Book Now <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
@@ -221,7 +228,7 @@ export default function HomePage() {
             ))}
           </div>
           <div className="text-center mt-10">
-            <Link href="/services" className="inline-flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-brand-purple transition-colors">
+            <Link href="/services" className="inline-flex items-center gap-2 text-sm font-medium text-brand-muted hover:text-brand-rose transition-colors">
               View full pricing details <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -229,8 +236,10 @@ export default function HomePage() {
       </section>
 
       {/* About / Story Section */}
-      <section className="py-24 lg:py-32">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="relative py-24 lg:py-32 overflow-hidden" style={{background:'linear-gradient(160deg, #F5EDE8 0%, #FBF8F6 40%, #EDE4DE 100%)'}}>
+        <div className="absolute top-20 -right-32 w-80 h-80 rounded-full bg-brand-rose/[0.06] blur-3xl" style={{animation: 'orb-drift 22s ease-in-out infinite'}} />
+        <div className="absolute bottom-10 -left-32 w-72 h-72 rounded-full bg-brand-gold/[0.04] blur-3xl" style={{animation: 'orb-drift 18s ease-in-out infinite reverse'}} />
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
             {/* Image */}
             <div className="relative">
@@ -240,6 +249,7 @@ export default function HomePage() {
                   alt="She Did That hair studio"
                   className="w-full h-full object-cover"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-brand-cream/30 to-transparent" />
               </div>
             </div>
 
@@ -250,34 +260,34 @@ export default function HomePage() {
                 Where Passion Meets Precision
               </h2>
               <div className="divider mb-8" />
-              <p className="text-gray-500 leading-relaxed mb-4">
+              <p className="text-brand-muted leading-relaxed mb-4">
                 She Did That was born from a love for protective styling and a belief
                 that every woman deserves to feel beautiful in her natural hair. What
                 started as a passion project has grown into a trusted studio known for
                 quality, consistency, and care.
               </p>
-              <p className="text-gray-500 leading-relaxed mb-8">
+              <p className="text-brand-muted leading-relaxed mb-8">
                 We use only premium products that protect and strengthen your hair.
                 Every braid is laid with intention, every cornrow with precision.
                 Your hair isn&apos;t just styled — it&apos;s cared for.
               </p>
               <div className="grid grid-cols-3 gap-6 mb-8">
                 <div className="text-center">
-                  <Shield className="h-5 w-5 text-brand-gold mx-auto mb-2" />
+                  <Shield className="h-5 w-5 text-brand-rose mx-auto mb-2" />
                   <p className="text-xs font-medium text-brand-charcoal">Protective Styles</p>
                 </div>
                 <div className="text-center">
-                  <Heart className="h-5 w-5 text-brand-gold mx-auto mb-2" />
+                  <Heart className="h-5 w-5 text-brand-rose mx-auto mb-2" />
                   <p className="text-xs font-medium text-brand-charcoal">Hair Health First</p>
                 </div>
                 <div className="text-center">
-                  <Sparkles className="h-5 w-5 text-brand-gold mx-auto mb-2" />
+                  <Sparkles className="h-5 w-5 text-brand-rose mx-auto mb-2" />
                   <p className="text-xs font-medium text-brand-charcoal">Premium Products</p>
                 </div>
               </div>
               <Link
                 href="/services"
-                className="inline-flex items-center gap-2 text-sm font-medium text-brand-purple hover:text-brand-purple-dark transition-colors"
+                className="inline-flex items-center gap-2 text-sm font-medium text-brand-rose hover:text-brand-rose-dark transition-colors"
               >
                 See Our Services <ArrowRight className="h-4 w-4" />
               </Link>
@@ -287,8 +297,9 @@ export default function HomePage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-24 lg:py-32 bg-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="py-24 lg:py-32 relative" style={{background:'linear-gradient(180deg, #EDE4DE 0%, #F5EDE8 50%, #F0E8E3 100%)'}}>
+        <div className="absolute inset-0 bg-gradient-to-tl from-brand-gold/[0.04] via-transparent to-brand-rose/[0.04]" />
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center mb-16">
             <p className="section-label mb-4">How It Works</p>
             <h2 className="section-heading">
@@ -301,21 +312,21 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
             {steps.map((step, i) => (
               <div key={i} className="text-center group">
-                <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-white border border-brand-gold/30 group-hover:bg-brand-gold group-hover:border-brand-gold transition-all duration-300">
-                  <step.icon className="h-6 w-6 text-brand-gold group-hover:text-white transition-colors duration-300" />
+                <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full glass-sm group-hover:shadow-glass-rose group-hover:scale-110 transition-all duration-500">
+                  <step.icon className="h-6 w-6 text-brand-rose group-hover:text-brand-rose-dark transition-colors duration-300" />
                 </div>
-                <p className="text-xs font-medium uppercase tracking-editorial text-brand-gold mb-3">
+                <p className="text-xs font-medium uppercase tracking-editorial text-brand-rose mb-3">
                   Step {i + 1}
                 </p>
                 <h3 className="font-display text-xl font-semibold text-brand-charcoal mb-2">
                   {step.title}
                 </h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{step.description}</p>
+                <p className="text-sm text-brand-muted leading-relaxed">{step.description}</p>
               </div>
             ))}
           </div>
           <div className="text-center mt-14">
-            <Link href="/booking" className="btn-primary px-8 py-4">
+            <Link href="/booking" className="btn-gold px-8 py-4">
               Start Booking <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -323,8 +334,10 @@ export default function HomePage() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-24 lg:py-32">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="relative py-24 lg:py-32 overflow-hidden" style={{background:'linear-gradient(200deg, #F5EDE8 0%, #EDE4DE 50%, #F0E8E3 100%)'}}>
+        <div className="absolute top-10 -left-24 w-72 h-72 rounded-full bg-brand-rose/[0.06] blur-3xl" style={{animation: 'orb-drift 20s ease-in-out infinite'}} />
+        <div className="absolute bottom-20 -right-24 w-80 h-80 rounded-full bg-violet-200/[0.03] blur-3xl" style={{animation: 'orb-drift 16s ease-in-out infinite reverse'}} />
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center mb-16">
             <p className="section-label mb-4">Client Love</p>
             <h2 className="section-heading">
@@ -333,36 +346,96 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {testimonials.map((t, i) => (
-              <div key={i} className="border border-gray-200 p-8 text-center hover:border-brand-gold/30 hover:shadow-soft transition-all duration-300">
+              <div key={i} className="glass p-8 text-center hover:shadow-glass-rose hover:-translate-y-1 transition-all duration-500">
                 <div className="flex justify-center gap-1 mb-6">
                   {[...Array(5)].map((_, j) => (
-                    <Star key={j} className="h-4 w-4 fill-brand-gold text-brand-gold" />
+                    <Star key={j} className="h-4 w-4 fill-brand-rose text-brand-rose" />
                   ))}
                 </div>
-                <p className="text-sm text-gray-600 leading-relaxed italic mb-8">
+                <p className="text-sm text-brand-muted leading-relaxed italic mb-8">
                   &ldquo;{t.quote}&rdquo;
                 </p>
                 <div className="divider mx-auto mb-6" />
                 <p className="font-display text-lg font-semibold text-brand-charcoal">
                   {t.name}
                 </p>
-                <p className="text-xs text-gray-400 mt-1">{t.service}</p>
+                <p className="text-xs text-brand-muted/60 mt-1">{t.service}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
+      {/* Maintenance Tips Preview */}
+      <section className="py-24 lg:py-32 relative" style={{background:'linear-gradient(180deg, #F0E8E3 0%, #EDE4DE 50%, #F5EDE8 100%)'}}>
+        <div className="absolute inset-0 bg-gradient-to-br from-brand-rose/[0.04] via-transparent to-brand-gold/[0.04]" />
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">
+          <div className="text-center mb-16">
+            <p className="section-label mb-4">Aftercare</p>
+            <h2 className="section-heading">
+              Maintenance &amp; Care
+            </h2>
+            <p className="section-subheading max-w-lg mx-auto">
+              Your afro crochet hair needs love. Here are the essentials to keep it looking fresh.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <div className="glass p-8 text-center group hover:shadow-glass-rose hover:-translate-y-1 transition-all duration-500">
+              <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full glass-sm text-brand-rose group-hover:scale-110 transition-all duration-500">
+                <Sparkles className="h-6 w-6" />
+              </div>
+              <h3 className="font-display text-lg font-semibold text-brand-charcoal mb-2">
+                Bedtime Routine
+              </h3>
+              <p className="text-sm text-brand-muted leading-relaxed">
+                Spray, massage, puff, and cover. Protect your hair every night with a scarf or bonnet.
+              </p>
+            </div>
+            <div className="glass p-8 text-center group hover:shadow-glass-rose hover:-translate-y-1 transition-all duration-500">
+              <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full glass-sm text-brand-rose group-hover:scale-110 transition-all duration-500">
+                <Heart className="h-6 w-6" />
+              </div>
+              <h3 className="font-display text-lg font-semibold text-brand-charcoal mb-2">
+                Morning Refresh
+              </h3>
+              <p className="text-sm text-brand-muted leading-relaxed">
+                Use mousse for definition and detangle gently with your hands — never combs or brushes.
+              </p>
+            </div>
+            <div className="glass p-8 text-center group hover:shadow-glass-rose hover:-translate-y-1 transition-all duration-500">
+              <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full glass-sm text-brand-rose group-hover:scale-110 transition-all duration-500">
+                <Shield className="h-6 w-6" />
+              </div>
+              <h3 className="font-display text-lg font-semibold text-brand-charcoal mb-2">
+                Handle with Care
+              </h3>
+              <p className="text-sm text-brand-muted leading-relaxed">
+                Avoid water submersion and be gentle. With proper care, your hair can last up to a month.
+              </p>
+            </div>
+          </div>
+          <div className="text-center mt-10">
+            <Link href="/tips" className="inline-flex items-center gap-2 text-sm font-medium text-brand-rose hover:text-brand-rose-dark transition-colors">
+              Read full care guide <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
-      <section className="py-24 lg:py-32 bg-brand-purple">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-xs font-medium uppercase tracking-editorial text-brand-gold-light mb-6">
+      <section className="relative py-24 lg:py-32 overflow-hidden" style={{background:'linear-gradient(135deg, #EDE4DE 0%, #F5EDE8 40%, #F0E8E3 100%)'}}>
+        <div className="absolute inset-0 bg-gradient-to-br from-brand-rose/[0.08] via-transparent to-brand-gold/[0.06]" />
+        <div className="absolute top-10 left-1/4 w-72 h-72 rounded-full bg-brand-rose/[0.05] blur-3xl" style={{animation: 'orb-drift 22s ease-in-out infinite'}} />
+        <div className="absolute bottom-10 right-1/4 w-72 h-72 rounded-full bg-brand-gold/[0.05] blur-3xl" style={{animation: 'orb-drift 18s ease-in-out infinite reverse'}} />
+        <div className="absolute top-1/3 right-1/3 w-48 h-48 rounded-full bg-violet-200/[0.03] blur-3xl" style={{animation: 'orb-drift 15s ease-in-out infinite 5s'}} />
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center relative">
+          <p className="text-xs font-medium uppercase tracking-editorial text-brand-rose mb-6">
             Ready?
           </p>
-          <h2 className="font-display text-4xl sm:text-5xl font-semibold text-white leading-[1.1] mb-6">
+          <h2 className="font-display text-4xl sm:text-5xl font-semibold text-brand-charcoal leading-[1.1] mb-6">
             Your Next Look Starts Here
           </h2>
-          <p className="text-white/60 max-w-md mx-auto mb-10 leading-relaxed">
+          <p className="text-brand-muted max-w-md mx-auto mb-10 leading-relaxed">
             Don&apos;t wait — book your appointment now and let us create
             something beautiful for you. Deposits start from just R100.
           </p>
@@ -370,8 +443,8 @@ export default function HomePage() {
             <Link href="/booking" className="btn-gold px-10 py-4">
               Book Your Appointment
             </Link>
-            <Link href="/tips" className="inline-flex items-center gap-2 text-sm font-medium text-white/60 hover:text-white transition-colors px-6 py-4">
-              Hair Care Tips <ArrowRight className="h-4 w-4" />
+            <Link href="/tips" className="inline-flex items-center gap-2 text-sm font-medium text-brand-muted hover:text-brand-rose transition-colors px-6 py-4">
+              Maintenance &amp; Care <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </div>

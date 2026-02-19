@@ -17,9 +17,9 @@ export const MAX_POP_SIZE_MB = 10;
 export const ACCEPTED_POP_TYPES = ["application/pdf", "image/jpeg", "image/png"];
 
 export const BOOKING_STATUSES = {
-  REQUESTED: { label: "Requested", color: "bg-yellow-100 text-yellow-800" },
-  POP_UPLOADED: { label: "POP Uploaded", color: "bg-blue-100 text-blue-800" },
-  CONFIRMED: { label: "Confirmed", color: "bg-green-100 text-green-800" },
-  REJECTED: { label: "Rejected", color: "bg-red-100 text-red-800" },
-  CANCELLED: { label: "Cancelled", color: "bg-gray-100 text-gray-800" },
+  REQUESTED: { label: "Requested", color: "bg-amber-50 text-amber-700" },
+  POP_UPLOADED: { label: "POP Uploaded", color: "bg-blue-50 text-blue-700" },
+  CONFIRMED: { label: "Confirmed", color: "bg-emerald-50 text-emerald-700" },
+  REJECTED: { label: "Rejected", color: "bg-red-50 text-red-700" },
+  CANCELLED: { label: "Cancelled", color: "bg-gray-100 text-gray-500" },
 } as const;

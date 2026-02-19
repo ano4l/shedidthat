@@ -42,6 +42,7 @@ export interface BookingRequest {
   end_time: string;
   payment_choice: PaymentChoice;
   amount_due: number;
+  juice_preference: string | null;
   status: BookingStatus;
   reference: string;
   created_at: string;

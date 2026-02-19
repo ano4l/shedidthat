@@ -4,8 +4,11 @@ import { Instagram, Phone, Mail } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="bg-brand-purple text-white/80">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
+    <footer className="relative border-t border-white/20 overflow-hidden" style={{background:'linear-gradient(180deg, #EDE4DE 0%, #F0E8E3 50%, #E8DDD6 100%)'}}>
+      <div className="absolute inset-0 bg-gradient-to-t from-brand-rose/[0.06] via-transparent to-transparent" />
+      <div className="absolute bottom-10 left-1/4 w-72 h-72 rounded-full bg-brand-rose/[0.03] blur-3xl" />
+      <div className="absolute top-10 right-1/4 w-72 h-72 rounded-full bg-brand-gold/[0.03] blur-3xl" />
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 lg:py-20 relative">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
           {/* Brand */}
           <div className="md:col-span-5">
@@ -13,12 +16,12 @@ export function Footer() {
               <Image
                 src="/images/logo.png"
                 alt="She Did That"
-                width={220}
-                height={82}
-                className="h-[4.5rem] w-auto object-contain brightness-0 invert"
+                width={300}
+                height={112}
+                className="h-28 w-auto object-contain"
               />
             </Link>
-            <p className="text-sm text-white/60 max-w-xs leading-relaxed">
+            <p className="text-sm text-brand-muted max-w-xs leading-relaxed">
               Premium hair styling services. From braids to cornrows, we create
               looks that make you feel confident and beautiful.
             </p>
@@ -26,23 +29,23 @@ export function Footer() {
 
           {/* Quick Links */}
           <div className="md:col-span-3">
-            <h4 className="text-xs font-medium uppercase tracking-editorial text-brand-gold-light mb-6">
+            <h4 className="text-xs font-medium uppercase tracking-editorial text-brand-rose mb-6">
               Explore
             </h4>
             <ul className="space-y-3">
               <li>
-                <Link href="/services" className="text-sm text-white/60 hover:text-white transition-colors duration-200">
+                <Link href="/services" className="text-sm text-brand-muted hover:text-brand-rose transition-colors duration-200">
                   Services &amp; Pricing
                 </Link>
               </li>
               <li>
-                <Link href="/booking" className="text-sm text-white/60 hover:text-white transition-colors duration-200">
+                <Link href="/booking" className="text-sm text-brand-muted hover:text-brand-rose transition-colors duration-200">
                   Book Appointment
                 </Link>
               </li>
               <li>
-                <Link href="/tips" className="text-sm text-white/60 hover:text-white transition-colors duration-200">
-                  Hair Care Tips
+                <Link href="/tips" className="text-sm text-brand-muted hover:text-brand-rose transition-colors duration-200">
+                  Maintenance &amp; Care
                 </Link>
               </li>
             </ul>
@@ -50,35 +53,35 @@ export function Footer() {
 
           {/* Contact */}
           <div className="md:col-span-4">
-            <h4 className="text-xs font-medium uppercase tracking-editorial text-brand-gold-light mb-6">
+            <h4 className="text-xs font-medium uppercase tracking-editorial text-brand-rose mb-6">
               Get in Touch
             </h4>
             <ul className="space-y-4">
-              <li className="flex items-center gap-3 text-sm text-white/60">
-                <Phone className="h-4 w-4 text-brand-gold-light" />
+              <li className="flex items-center gap-3 text-sm text-brand-muted">
+                <Phone className="h-4 w-4 text-brand-rose/60" />
                 <span>+27 XX XXX XXXX</span>
               </li>
-              <li className="flex items-center gap-3 text-sm text-white/60">
-                <Mail className="h-4 w-4 text-brand-gold-light" />
+              <li className="flex items-center gap-3 text-sm text-brand-muted">
+                <Mail className="h-4 w-4 text-brand-rose/60" />
                 <span>hello@shedidthat.co.za</span>
               </li>
-              <li className="flex items-center gap-3 text-sm text-white/60">
-                <Instagram className="h-4 w-4 text-brand-gold-light" />
+              <li className="flex items-center gap-3 text-sm text-brand-muted">
+                <Instagram className="h-4 w-4 text-brand-rose/60" />
                 <span>@shedidthat</span>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="mt-16 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-white/40">
+        <div className="mt-16 pt-8 border-t border-brand-charcoal/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-brand-muted/60">
             &copy; {new Date().getFullYear()} She Did That. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
-            <p className="text-xs text-white/30">
+            <p className="text-xs text-brand-muted/40">
               Crafted with care in South Africa
             </p>
-            <Link href="/admin" className="text-xs text-white/20 hover:text-white/40 transition-colors">
+            <Link href="/admin" className="text-xs text-brand-muted/30 hover:text-brand-muted/60 transition-colors">
               Admin
             </Link>
           </div>

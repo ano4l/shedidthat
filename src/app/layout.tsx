@@ -21,13 +21,13 @@ export const metadata: Metadata = {
     "Book your next hair appointment at SheDidThat. Premium braiding, cornrows, and styling services.",
   keywords: ["hair salon", "braiding", "cornrows", "booking", "South Africa"],
   icons: {
-    icon: "/images/icon.png",
-    apple: "/images/icon.png",
+    icon: "/images/logo.png",
+    apple: "/images/logo.png",
   },
   openGraph: {
     title: "SheDidThat — Premium Hair Studio",
     description: "Book your next hair appointment at SheDidThat. Premium braiding, cornrows, and styling services.",
-    images: [{ url: "/images/icon.png" }],
+    images: [{ url: "/images/logo.png" }],
   },
 };
 
